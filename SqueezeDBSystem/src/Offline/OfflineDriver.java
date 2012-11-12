@@ -89,7 +89,12 @@ public class OfflineDriver {
 	//fell free to modify that.
 	public static String dbName = "db.cs.brown.edu/squeezedb";
 	public static String userName = "szhang";
-	public static String password = "come on baby hey we go";
+	public static String password = "36453645Zs";
+	
+	//3 sample table names, for accuracy: low, mid, high
+	public static String sampleTableLow = "sampledata08";
+	public static String sampleTableMid = "sampledata05";
+	public static String sampleTableHigh = "sampledata02";
 	
 	public static Connection connectToOriginalDB() throws ClassNotFoundException, SQLException{
 		Class.forName("org.postgresql.Driver");
@@ -106,16 +111,24 @@ public class OfflineDriver {
 		// TODO Auto-generated method stub
 		Connection conn = OfflineDriver.connectToOriginalDB();
 		/* already generated in this machine..... */
-		OriginalDataGenerator.sqlGenerator("OriginalSqlQuery");
-		OriginalDataGenerator.generateRandomDataset(conn, "OriginalSqlQuery");
+		//OriginalDataGenerator.sqlGenerator("OriginalSqlQuery");
+		//OriginalDataGenerator.generateRandomDataset(conn, "OriginalSqlQuery");
 		
 		
 		//sampling
 		
-		int sampleSize = DatabaseSampler.sampleSqlSentence(10, 10, 0.5, 0.5, "OriginalSqlQuery", "SampledSqlQuery", "sampledata");
-		System.out.println("Calculated Sample ize:" + sampleSize);
+		int sampleSize = DatabaseSampler.sampleSqlSentence(10, 10, 0.5, 0.2, "OriginalSqlQuery", "SampledSqlQuery02", "sampledata02");
+		System.out.println("Calculated Sample size :" + sampleSize);
+		DatabaseSampler.createSampleTable(conn, "SampledSqlQuery02", "sampledata02");
 		
-		DatabaseSampler.createSampleTable(conn, "SampledSqlQuery", "sampledata");
+		sampleSize = DatabaseSampler.sampleSqlSentence(10, 10, 0.5, 0.5, "OriginalSqlQuery", "SampledSqlQuery05", "sampledata05");
+		System.out.println("Calculated Sample size :" + sampleSize);
+		DatabaseSampler.createSampleTable(conn, "SampledSqlQuery05", "sampledata05");
+		
+		sampleSize = DatabaseSampler.sampleSqlSentence(10, 10, 0.5, 0.8, "OriginalSqlQuery", "SampledSqlQuery08", "sampledata08");
+		System.out.println("Calculated Sample size :" + sampleSize);
+		DatabaseSampler.createSampleTable(conn, "SampledSqlQuery08", "sampledata08");
+		
 		conn.close();
 	
 	}

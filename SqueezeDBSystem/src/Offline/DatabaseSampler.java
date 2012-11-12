@@ -50,7 +50,7 @@ public class DatabaseSampler {
 		int vcDimension = SampleSizeCalculator.calculateVCDimension(columns,
 				booleans);
 		int sample_size = DatabaseSampler.SampleSize = SampleSizeCalculator
-				.calculateSampleSize(d, e, vcDimension);
+				.calculateSampleSize(e, d, vcDimension);
 		// uniform Sampling
 		int db_size = DatabaseSampler.DBSize = OriginalDataGenerator.databaseSize;
 
