@@ -1,7 +1,5 @@
 package Online;
 
-import Offline.*;
-
 import java.util.*;
 import java.util.Map.Entry;
 import java.sql.*;
@@ -27,11 +25,10 @@ public class Sum {
 				frequencies.put(k, new Integer(1));
 		}
 
-		Iterator it = frequencies.entrySet().iterator();
+		Iterator<Map.Entry<Integer, Integer>> it = frequencies.entrySet().iterator();
 		while (it.hasNext()) {
-			Entry entry = (Entry) it.next();
-			// sum += entry.getKey() * (entry.getValue() / (double)sample_size)
-			// * db_size;
+			Entry<Integer, Integer> entry = (Entry<Integer, Integer>) it.next();
+			sum += entry.getKey() * (entry.getValue() / (double)sample_size) * db_size;
 		}
 
 		return sum;
