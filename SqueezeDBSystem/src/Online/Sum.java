@@ -4,6 +4,8 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.sql.*;
 
+
+
 public class Sum {
 
 	public static int processSum(ResultSet result) throws SQLException {
