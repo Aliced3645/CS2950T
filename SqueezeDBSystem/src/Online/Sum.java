@@ -6,13 +6,13 @@ import java.sql.*;
 
 public class Sum {
 
-	public static int processSum(ResultSet result, int sample_size, int db_size) throws SQLException {
+	public static long processSum(ResultSet result, int sample_size, int db_size) throws SQLException {
 
 		HashMap<Integer, Integer> frequencies = new HashMap<Integer, Integer>();
 		Integer k;
 		Integer v;
 
-		int sum = 0;
+		long sum = 0;
 		int s = 0;
 		while (result.next()) {
 			k = new Integer(result.getInt("value"));// sum first column
