@@ -87,9 +87,9 @@ class OriginalDataGenerator{
 public class OfflineDriver {
 
 	//fell free to modify that.
-	public static String dbName = "db.cs.brown.edu/queezedb";
+	public static String dbName = "db.cs.brown.edu/squeezedb";
 	public static String userName = "szhang";
-	public static String password = "36453645Zs";
+	public static String password = "come on baby hey we go";
 	
 	public static Connection connectToOriginalDB() throws ClassNotFoundException, SQLException{
 		Class.forName("org.postgresql.Driver");
@@ -105,13 +105,17 @@ public class OfflineDriver {
 		
 		// TODO Auto-generated method stub
 		Connection conn = OfflineDriver.connectToOriginalDB();
-		/* already generated in this machine..... 
+		/* already generated in this machine..... */
 		OriginalDataGenerator.sqlGenerator("OriginalSqlQuery");
 		OriginalDataGenerator.generateRandomDataset(conn, "OriginalSqlQuery");
-		*/
+		
 		
 		//sampling
 		
+		int sampleSize = DatabaseSampler.sampleSqlSentence(10, 10, 0.5, 0.5, "OriginalSqlQuery", "SampledSqlQuery", "sampledata");
+		System.out.println("Calculated Sample ize:" + sampleSize);
+		
+		DatabaseSampler.createSampleTable(conn, "SampledSqlQuery", "sampledata");
 		conn.close();
 	
 	}

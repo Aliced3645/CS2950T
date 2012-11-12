@@ -33,7 +33,7 @@ class SampleSizeCalculator {
 		}
 	}
 
-	public static int calculateSampleSize(float eps, float delta, int vcd) {
+	public static int calculateSampleSize(double eps, double delta, int vcd) {
 		return (int) Math.ceil(0.5 / (eps * eps) * (vcd + Math.log(1 / delta)));
 	}
 
@@ -44,13 +44,13 @@ public class DatabaseSampler {
 	public static int DBSize;
 	public static int SampleSize;
 
-	public int sampleSqlSentence(int columns, int booleans, float eps, float delta,
-			 String inputSqlFileName, String outputSqlFileName) throws IOException {
+	public static int sampleSqlSentence(int columns, int booleans, double d, double e,
+			 String inputSqlFileName, String outputSqlFileName, String sampleTableName) throws IOException {
 
 		int vcDimension = SampleSizeCalculator.calculateVCDimension(columns,
 				booleans);
 		int sample_size = DatabaseSampler.SampleSize = SampleSizeCalculator
-				.calculateSampleSize(eps, delta, vcDimension);
+				.calculateSampleSize(d, e, vcDimension);
 		// uniform Sampling
 		int db_size = DatabaseSampler.DBSize = OriginalDataGenerator.databaseSize;
 
@@ -66,6 +66,9 @@ public class DatabaseSampler {
 		Random rand;
 
 		in = new RandomAccessFile(new File(inputSqlFileName), "r");
+		File outputfile = new File(outputSqlFileName);
+		if(outputfile.exists())
+			outputfile.delete();
 		out = new BufferedWriter(new FileWriter(outputSqlFileName));
 		int rows_sampled[];
 		rows_sampled = new int[db_size];
@@ -73,27 +76,41 @@ public class DatabaseSampler {
 			rows_sampled[i] = 0;
 
 		int random_tuple;
-
+		String sampleSqlString = "INSERT INTO " + sampleTableName + " VALUES ";
+		
 		rand = new Random();
 		// randomly sample s tuples
 		for (int i = 0; i < sample_size; i++) {
 			random_tuple = rand.nextInt(db_size);
 			rows_sampled[random_tuple]++;
 		}
-
+		int firstTime = 0;
+		int startDataIndex = 0;
 		for (int i = 0; i < db_size; i++) {
 			tuple = in.readLine();
+			if(firstTime == 0){
+				//get the index starting for the value
+				for(int j = 0; j < tuple.length(); j ++){
+					if(tuple.charAt(j) == '(')
+						startDataIndex = j;
+				}
+				firstTime = 1;
+			}
 			if (tuple == null)
 				break;
-			for (int j = 0; j < rows_sampled[i]; j++)
-				out.write(tuple + "\n");
+			for (int j = 0; j < rows_sampled[i]; j++){
+				String to_wirte = sampleSqlString + tuple.substring(startDataIndex);
+				
+				out.write(to_wirte+ "\n");
+			}
+				
 		}
 
 		out.close();
-		return 0;
+		return DatabaseSampler.SampleSize;
 	}
 	
-	public int createSampleTable(Connection conn, String sqlFile, String sampleTableName) throws SQLException, IOException{
+	public static int createSampleTable(Connection conn, String sqlFile, String sampleTableName) throws SQLException, IOException{
 		
 		Statement st = conn.createStatement();
 		//test if there exists a table called bigdata, if yes, then delete it..
