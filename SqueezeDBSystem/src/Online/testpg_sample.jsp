@@ -1,7 +1,7 @@
 <%@ page import="java.sql.*" %>
 <%@ page import="java.util.*" %>
 <%@ page import="java.util.Properties" %>
-<%@ page import="com.squeeze.*"  language="java"  pageEncoding="utf-8"%>
+<%@ page import="Online.*"  language="java"  pageEncoding="utf-8"%>
 <%@page errorPage="SyntexErr.jsp"%>
 
 <html>
