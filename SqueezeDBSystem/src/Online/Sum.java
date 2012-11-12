@@ -13,16 +13,18 @@ public class Sum {
 		Integer v;
 
 		int sum = 0;
-
+		int s = 0;
 		while (result.next()) {
-			k = new Integer(result.getInt(0));// sum first column
+			k = new Integer(result.getInt("value"));// sum first column
 			if (frequencies.containsKey(k)) {
 				v = frequencies.get(k);
 				frequencies.put(k, new Integer(++v));
 			} else
 				frequencies.put(k, new Integer(1));
+			s++;
 		}
 
+		System.out.println(s);
 		Iterator<Map.Entry<Integer, Integer>> it = frequencies.entrySet().iterator();
 		while (it.hasNext()) {
 			Entry<Integer, Integer> entry = (Entry<Integer, Integer>) it.next();
