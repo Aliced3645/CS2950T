@@ -4,13 +4,9 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.sql.*;
 
-
-
 public class Sum {
 
-	public static int processSum(ResultSet result) throws SQLException {
-		int sample_size = 1;
-		int db_size = 2;
+	public static int processSum(ResultSet result, int sample_size, int db_size) throws SQLException {
 
 		HashMap<Integer, Integer> frequencies = new HashMap<Integer, Integer>();
 		Integer k;
