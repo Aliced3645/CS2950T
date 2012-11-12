@@ -95,9 +95,9 @@ public class OfflineDriver {
 	public static String sampleTableLow = "sampledata08";
 	public static String sampleTableMid = "sampledata05";
 	public static String sampleTableHigh = "sampledata02";
-	public static int sampleRowNumberLow = 18647;
+	public static int sampleRowNumberLow = 1166;
 	public static int sampleRowNumberMid = 2984;
-	public static int sampleRowNumberHigh = 1166;
+	public static int sampleRowNumberHigh = 18647;
 	
 	public static Connection connectToOriginalDB() throws ClassNotFoundException, SQLException{
 		Class.forName("org.postgresql.Driver");

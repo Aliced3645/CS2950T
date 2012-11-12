@@ -18,11 +18,11 @@
 <script type = "text/javascript">
 	function SubmitQuery(){
 			showResults();
-			document.forms['submit_query_form'].action='testpg.jsp';
+			document.forms['submit_query_form'].action='../src/Online/testpg.jsp';
 			document.forms['submit_query_form'].target ='origin_db_result';
 			document.forms['submit_query_form'].submit();
 		
-			document.forms['submit_query_form'].action='testpg_sample.jsp';
+			document.forms['submit_query_form'].action='../src/Online/testpg_sample.jsp';
 			document.forms['submit_query_form'].target ='sample_db_result';
 			document.forms['submit_query_form'].submit();
 	}
@@ -99,10 +99,10 @@ Please select your expected query accuracy. <br>
 <!-- iframe for showing -->
 <div id="resultContainer">
 <div class="left">
-	 <iframe name="origin_db_result" src="testpg.jsp" frameborder="1" scrolling="yes" height="600px" width="400px"></iframe>
+	 <iframe name="origin_db_result" src="../src/Online/testpg.jsp" frameborder="1" scrolling="yes" height="600px" width="400px"></iframe>
 </div>
 <div class="right">
-	 <iframe name="sample_db_result" src="testpg_sample.jsp" frameborder="1" scrolling="yes" height="600px" width="400px"></iframe>
+	 <iframe name="sample_db_result" src="../src/Online/testpg_sample.jsp" frameborder="1" scrolling="yes" height="600px" width="400px"></iframe>
 </div>
 </div>
 </body>

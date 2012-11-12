@@ -13,7 +13,7 @@ String db_pw="36453645Zs";
 Connection conn= DriverManager.getConnection(db_url, db_user, db_pw);
 Statement stmt=conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,ResultSet.CONCUR_UPDATABLE);
 
-String sql_sentence = request.getParameter("sqlInput") + "_origin";
+String sql_sentence = request.getParameter("sqlInput");
 long start = System.nanoTime();
 ResultSet rs=stmt.executeQuery(sql_sentence);
 long end = System.nanoTime();
