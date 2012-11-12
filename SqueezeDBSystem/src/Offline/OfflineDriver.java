@@ -114,8 +114,8 @@ public class OfflineDriver {
 		// TODO Auto-generated method stub
 		Connection conn = OfflineDriver.connectToOriginalDB();
 		/* already generated in this machine..... */
-		//OriginalDataGenerator.sqlGenerator("OriginalSqlQuery");
-		//OriginalDataGenerator.generateRandomDataset(conn, "OriginalSqlQuery");
+		OriginalDataGenerator.sqlGenerator("OriginalSqlQuery");
+		OriginalDataGenerator.generateRandomDataset(conn, "OriginalSqlQuery");
 		
 		
 		//sampling
