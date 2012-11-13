@@ -4,7 +4,7 @@
 <%@ page import="java.util.*"%>
 <%@ page import="java.util.Properties"%>
 <%@ page import="Online.*" language="java" pageEncoding="utf-8"%>
-<%-- <%@page errorPage="SyntexErr.jsp"%>--%>
+<%@page errorPage="SyntexErr.jsp"%>
 
 <html>
 <body>
