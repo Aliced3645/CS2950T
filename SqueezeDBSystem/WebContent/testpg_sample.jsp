@@ -1,9 +1,9 @@
 <%@page import="Offline.DatabaseSampler"%>
 <%@page import="Offline.OfflineDriver"%>
-<%@ page import="java.sql.*"%>
-<%@ page import="java.util.*"%>
-<%@ page import="java.util.Properties"%>
-<%@ page import="Online.*" language="java" pageEncoding="utf-8"%>
+<%@page import="java.sql.*"%>
+<%@page import="java.util.*"%>
+<%@page import="java.util.Properties"%>
+<%@page import="Online.*" language="java" pageEncoding="utf-8"%>
 <%@page errorPage="SyntexErr.jsp"%>
 
 <html>
@@ -19,9 +19,9 @@
 		Statement stmt = conn
 				.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
 						ResultSet.CONCUR_UPDATABLE);
-		//String sql_sentence = request.getParameter("sqlInput") + "_sample";
+		String originSQL = request.getParameter("sqlInput");
 		String inputRadio = request.getParameter("accuracy");
-		//System.out.println(inputRadio);
+
 		String tableName;
 		int lineNumber;
 		if (!inputRadio.isEmpty()) {
@@ -43,25 +43,29 @@
 			tableName = "bigdata";
 			lineNumber = 1000000;
 		}
-
-		String sql_sentence = "select * from " + tableName + ";";
+		Aggregator aggregator = new Aggregator();
+		aggregator.getAggregator(originSQL);
+		String sql_sentence = SqlRegenerator.regenerate(originSQL, tableName);
 		long start = System.nanoTime();
 		ResultSet rs = stmt.executeQuery(sql_sentence);
-		long sum = Sum.processSum(rs, lineNumber, 1000000);
 		long end = System.nanoTime();
 		long interval = end - start;
-		//ResultSetMetaData rsmd = rs.getMetaData();
-		//int cols = rsmd.getColumnCount();
+
 	%>
 	<table border='12'>
 		<caption>Query Result at SampleDB....</caption>
 		<tr>
 			<%=request.getParameter("sqlInput")%>
-			<th>Estimated Sum</th>
+			<th>Estimated <%=aggregator.name %></th>
 		</tr>
 		<br\>
 		<tr>
-			<td><%=sum%></td>
+			<% if(aggregator.name.equals("sum")) {%>
+				<td><%=Sum.process(rs, lineNumber, 1000000)%></td>
+			<%} else if (aggregator.name.equals("avg")) {%>
+				<td><%=Avg.process(rs, lineNumber, 1000000)%></td>
+			<%} %>
+				
 		</tr>
 	</table>
 	<br\>

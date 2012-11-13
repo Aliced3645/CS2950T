@@ -1,18 +1,20 @@
 package Online;
 
-import java.util.*;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Map.Entry;
-import java.sql.*;
 
-public class Sum {
-
-	public static long process(ResultSet result, int sample_size, int db_size) throws SQLException {
+public class Avg {
+	public static double process(ResultSet result, int sample_size, int db_size) throws SQLException {
 
 		HashMap<Integer, Integer> frequencies = new HashMap<Integer, Integer>();
 		Integer k;
 		Integer v;
 
-		long sum = 0;
+		double avg = 0;
 
 		while (result.next()) {
 			k = new Integer(result.getInt("value"));// sum first column
@@ -28,10 +30,9 @@ public class Sum {
 		Iterator<Map.Entry<Integer, Integer>> it = frequencies.entrySet().iterator();
 		while (it.hasNext()) {
 			Entry<Integer, Integer> entry = (Entry<Integer, Integer>) it.next();
-			sum += entry.getKey() * (entry.getValue() / (double)sample_size) * db_size;
+			avg += entry.getKey() * (entry.getValue() / (double)sample_size);
 		}
 
-		return sum;
+		return avg;
 	}
-
 }
