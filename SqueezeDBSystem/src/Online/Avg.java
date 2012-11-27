@@ -44,7 +44,7 @@ public class Avg {
 	}
 
 	public static double[] calculateAvgConfidenceInterval(ResultSet resultSet,
-			int sampleSize, int dbSize) {
+			int sampleSize, int dbSize, double epsilon) {
 		double[] bounds = new double[2];
 		CplexSolution solution_min;
 		CplexSolution solution_max;
@@ -98,13 +98,13 @@ public class Avg {
 			
 			// min bound
 			solution_min = SumSolver.sumSolver(min, max, query_selectivity,
-						selectivity, eta, .02, false);
+						selectivity, eta, epsilon, false);
 			// max bound
 			solution_max = SumSolver.sumSolver(min, max, query_selectivity,
-						selectivity, eta, .02, true);
+						selectivity, eta, epsilon, true);
 			
-			bounds[0] = (solution_min.objective_value * dbSize) / ( dbSize * ( query_selectivity - 0.02));
-			bounds[1] = solution_max.objective_value * dbSize / ( dbSize * ( query_selectivity - 0.02));
+			bounds[0] = (solution_min.objective_value * dbSize) / ( dbSize * ( query_selectivity - epsilon));
+			bounds[1] = solution_max.objective_value * dbSize / ( dbSize * ( query_selectivity - epsilon));
 			
 		} catch (Exception e) {
 			e.printStackTrace(System.out);

@@ -48,7 +48,7 @@ public class Sum {
 	}
 
 	public static double[] calculateSumConfidenceInterval(ResultSet resultSet,
-			int sampleSize, int dbSize) {
+			int sampleSize, int dbSize, double epsilon) {
 
 		// order: solution_min, solution_max ( confidence bounds )
 		double[] bounds = new double[2];
@@ -107,10 +107,10 @@ public class Sum {
 
 			// min bound
 			solution_min = SumSolver.sumSolver(min, max, query_selectivity,
-					selectivity, eta, .02, false);
+					selectivity, eta, epsilon, false);
 			// max bound
 			solution_max = SumSolver.sumSolver(min, max, query_selectivity,
-					selectivity, eta, .02, true);
+					selectivity, eta, epsilon, true);
 
 			bounds[0] = solution_min.objective_value * dbSize;
 			bounds[1] = solution_max.objective_value * dbSize;

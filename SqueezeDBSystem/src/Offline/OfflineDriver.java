@@ -133,6 +133,8 @@ public class OfflineDriver {
 		DatabaseSampler.createSampleTable(conn, "SampledSqlQuery08", "sampledata08");
 		
 		conn.close();
+		
+		
 	
 	}
 
