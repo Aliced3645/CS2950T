@@ -84,6 +84,7 @@ public class DatabaseSampler {
 			random_tuple = rand.nextInt(db_size);
 			rows_sampled[random_tuple]++;
 		}
+		
 		int firstTime = 0;
 		int startDataIndex = 0;
 		for (int i = 0; i < db_size; i++) {
