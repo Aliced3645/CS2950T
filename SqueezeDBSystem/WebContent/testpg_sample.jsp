@@ -3,7 +3,14 @@
 <%@page import="java.sql.*"%>
 <%@page import="java.util.*"%>
 <%@page import="java.util.Properties"%>
+<%@page import="ilog.concert.IloException"%>
+<%@page import="ilog.concert.IloNumExpr"%>
+<%@page import="ilog.concert.IloNumVar"%>
+<%@page import="ilog.cplex.IloCplex"%>
 <%@page import="Online.*" language="java" pageEncoding="utf-8"%>
+<%--@page import="Online.Avg" language="java" pageEncoding="utf-8"--%>
+<%--@page import="Online.Sum" language="java" pageEncoding="utf-8"--%>
+
 <%@page errorPage="SyntexErr.jsp"%>
 
 <html>
@@ -21,19 +28,23 @@
 						ResultSet.CONCUR_UPDATABLE);
 		String originSQL = request.getParameter("sqlInput");
 		String inputRadio = request.getParameter("accuracy");
-
+		int sampleSize;
+		double epsilon = 0;
 		String tableName;
 		int lineNumber;
 		if (!inputRadio.isEmpty()) {
 			if (inputRadio.equals("highAccuracy")) {
 				tableName = OfflineDriver.sampleTableHigh;
 				lineNumber = OfflineDriver.sampleRowNumberHigh;
+				epsilon = 0.2;
 			} else if (inputRadio.equals("middleAccuracy")) {
 				tableName = OfflineDriver.sampleTableMid;
 				lineNumber = OfflineDriver.sampleRowNumberMid;
+				epsilon = 0.5;
 			} else if (inputRadio.equals("lowAccuracy")) {
 				tableName = OfflineDriver.sampleTableLow;
 				lineNumber = OfflineDriver.sampleRowNumberLow;
+				epsilon = 0.8;
 			} else {
 				tableName = "bigdata";
 				lineNumber = 1000000;
@@ -50,8 +61,30 @@
 		ResultSet rs = stmt.executeQuery(sql_sentence);
 		long end = System.nanoTime();
 		long interval = end - start;
-
+		
+		
+		double[] bounds = new double[2];
+		long estimatedValueSum = 0;
+		double estimatedValueAvg = 0;
+		//try to calculate the confidence interval
+		if(aggregator.name.equals("sum")){
+			bounds = Sum.calculateSumConfidenceInterval(rs, lineNumber, 1000000, epsilon);
+			rs.first();
+			estimatedValueSum = Sum.process(rs, lineNumber, 1000000);
+			bounds[0] += estimatedValueSum;
+			bounds[1] += estimatedValueSum;
+		}
+		else if(aggregator.name.equals("avg")){
+			bounds = Avg.calculateAvgConfidenceInterval(rs, lineNumber, 1000000, epsilon);
+			rs.first();
+			estimatedValueAvg = Avg.process(rs, lineNumber, 1000000);
+			bounds[0] += estimatedValueAvg;
+			bounds[1] += estimatedValueAvg;
+		}
+		
+		
 	%>
+	
 	<table border='12'>
 		<caption>Query Result at SampleDB....</caption>
 		<tr>
@@ -61,14 +94,30 @@
 		<br\>
 		<tr>
 			<% if(aggregator.name.equals("sum")) {%>
-				<td><%=Sum.process(rs, lineNumber, 1000000)%></td>
+				<td><%=estimatedValueSum%></td>
 			<%} else if (aggregator.name.equals("avg")) {%>
-				<td><%=Avg.process(rs, lineNumber, 1000000)%></td>
-			<%} %>
-				
+				<td><%=estimatedValueAvg%></td>
+			<%} %>			
 		</tr>
+		
+		<tr>
+			<th>Low Confidence Bound </th>
+		</tr>
+		<br\>
+		<tr>
+			<td><%=(long)bounds[0]%></td>
+		</tr>
+		<tr>
+			<th>High Confidence Bound </th>
+		</tr>
+		<br\>
+		<tr>
+			<td><%=(long)bounds[1]%></td>
+		</tr>
+		
 	</table>
 	<br\>
+	
 	<table border='3' bgcolor="green">
 		<tr>
 			<td>Time Cost(s):</td>

@@ -69,7 +69,6 @@ public class Sum {
 		try {
 			while (resultSet.next()) {
 				k = new Integer(resultSet.getInt("value"));
-
 				// update max and min
 				if (k.intValue() > max)
 					max = k.intValue();
