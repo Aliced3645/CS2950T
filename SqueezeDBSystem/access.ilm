@@ -1,0 +1,6 @@
+LICENSE brown-providence, ri
+SERVER 3000 flexlm 0a746f1c 20059
+TOKEN Solver 6.600 NEVER ZJVWC1864ST2 15 any , server: flexlm
+TOKEN CPLEX 12.100 NEVER P642F0HYGN85 35 any , server: flexlm , options: b e m q use=35
+TOKEN Scheduler 6.600 NEVER 1ZEPU0G80N9F 15 any , server: flexlm
+TOKEN Dispatcher 4.600 NEVER 1EZY200G05HZ 15 any , server: flexlm

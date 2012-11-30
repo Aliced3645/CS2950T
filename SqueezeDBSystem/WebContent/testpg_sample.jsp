@@ -11,7 +11,7 @@
 <%--@page import="Online.Avg" language="java" pageEncoding="utf-8"--%>
 <%--@page import="Online.Sum" language="java" pageEncoding="utf-8"--%>
 
-<%@page errorPage="SyntexErr.jsp"%>
+<%--@page errorPage="SyntexErr.jsp"--%>
 
 <html>
 <body>
