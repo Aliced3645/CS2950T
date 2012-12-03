@@ -32,13 +32,16 @@ public class Avg {
 				frequencies.put(k, new Integer(1));
 
 		}
-
+		long sum = 0;
+		double query_selectivity = 0;
 		Iterator<Map.Entry<Integer, Integer>> it = frequencies.entrySet()
 				.iterator();
 		while (it.hasNext()) {
 			Entry<Integer, Integer> entry = (Entry<Integer, Integer>) it.next();
-			avg += entry.getKey() * (entry.getValue() / (double) sample_size);
+			sum += entry.getKey() * (entry.getValue() / (double) sample_size);
+			query_selectivity += entry.getValue() / (double) sample_size;
 		}
+		avg = sum / query_selectivity;
 
 		return avg;
 	}
@@ -103,7 +106,7 @@ public class Avg {
 			solution_max = SumSolver.sumSolver(min, max, query_selectivity,
 						selectivity, eta, epsilon, true);
 			
-			bounds[0] = (solution_min.objective_value * dbSize) / ( dbSize * ( query_selectivity - epsilon));
+			bounds[0] = (solution_min.objective_value * dbSize) / ( dbSize * ( query_selectivity + epsilon));
 			bounds[1] = solution_max.objective_value * dbSize / ( dbSize * ( query_selectivity - epsilon));
 			
 		} catch (Exception e) {

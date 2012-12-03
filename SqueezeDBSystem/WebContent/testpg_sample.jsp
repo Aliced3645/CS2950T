@@ -81,6 +81,9 @@
 			bounds[0] += estimatedValueAvg;
 			bounds[1] += estimatedValueAvg;
 		}
+		else if(aggregator.name.equals("variance")){
+			
+		}
 		
 		
 	%>
