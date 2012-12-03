@@ -90,19 +90,17 @@
 			bounds = Variance.calculateVarianceConfidenceInterval(rs, lineNumber, 1000000, epsilon);
 		}
 		else if(aggregator.name.equals("count")){
-			bounds[0] = 0;
-			bounds[1] = 0;
 			//get the value to query
 			int startIndex = 0, endIndex = 0;
 			for(int i = 0; i < originSQL.length(); i ++){
 				if(originSQL.charAt(i) == '=')
 					startIndex = i;
-				//if(originSQL.charAt(i) == ')')
-				//	endIndex = i;
 			}
 			String numStr = originSQL.substring(startIndex + 1);
 			target_value = Integer.parseInt(numStr);
 			estimatedValueCount = Count.process(rs, lineNumber, 1000000, target_value);
+			rs.first();
+			bounds = Count.calculateCountConfidenceInterval(rs, lineNumber, 1000000, epsilon, target_value);
 			
 		}
 		
