@@ -61,12 +61,13 @@
 		ResultSet rs = stmt.executeQuery(sql_sentence);
 		long end = System.nanoTime();
 		long interval = end - start;
-		
+		int target_value = 0;
 		
 		double[] bounds = new double[2];
 		long estimatedValueSum = 0;
 		double estimatedValueAvg = 0;
 		double estimatedValueVariance = 0;
+		long estimatedValueCount = 0;
 		
 		//try to calculate the confidence interval
 		if(aggregator.name.equals("sum")){
@@ -88,6 +89,22 @@
 			rs.first();
 			bounds = Variance.calculateVarianceConfidenceInterval(rs, lineNumber, 1000000, epsilon);
 		}
+		else if(aggregator.name.equals("count")){
+			bounds[0] = 0;
+			bounds[1] = 0;
+			//get the value to query
+			int startIndex = 0, endIndex = 0;
+			for(int i = 0; i < originSQL.length(); i ++){
+				if(originSQL.charAt(i) == '=')
+					startIndex = i;
+				//if(originSQL.charAt(i) == ')')
+				//	endIndex = i;
+			}
+			String numStr = originSQL.substring(startIndex + 1);
+			target_value = Integer.parseInt(numStr);
+			estimatedValueCount = Count.process(rs, lineNumber, 1000000, target_value);
+			
+		}
 		
 		
 	%>
@@ -106,6 +123,8 @@
 				<td><%=estimatedValueAvg%></td>
 			<%} else if (aggregator.name.equals("variance")) {%>
 				<td><%=estimatedValueVariance%></td>
+			<%} else if (aggregator.name.equals("count")) {%>
+				<td><%=estimatedValueCount%></td>
 			<%} %>			
 		</tr>
 		

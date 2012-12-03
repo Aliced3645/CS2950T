@@ -9,5 +9,6 @@ public class SqlRegenerator {
         else
             sql_sentence = sql[0] + " * " + sql[2] + " " + tableName;
 		return sql_sentence;
+		
 	}
 }

@@ -17,5 +17,8 @@ public class Aggregator {
 		else if(sql[1].contains("variance")){
 			this.name = "variance";
 		}
+		else if(sql[1].contains("count")){
+			this.name = "count";
+		}
 	}
 }
