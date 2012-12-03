@@ -52,6 +52,9 @@ public class Variance {
 		
 		size_minus_1 -= 1;
 		squaresize_minus_size = size_minus_1 * (size_minus_1 + 1);
+		
+		//variance = term2;
+		
 		term2 = term2 * term2;
 		variance =  term1 / size_minus_1  - term2 / squaresize_minus_size ;
 		
@@ -150,6 +153,15 @@ public class Variance {
 
 			double squaresigma_upper;
 			double squaresigma_lower;
+		
+			//squaresigma_upper = Math.sqrt(term2);
+		    //squaresigma_lower = 0;
+			
+			term2 = Math.sqrt(term2);
+			
+			squaresigma_upper = (sigma_bounds[1] + term2) * (sigma_bounds[1] + term2);
+		    squaresigma_lower = (sigma_bounds[0] + term2) * (sigma_bounds[0] + term2);
+		
 			
 			if((sigma_bounds[0] + term2)>=0)
 			{
@@ -167,8 +179,12 @@ public class Variance {
 			    squaresigma_lower = (sigma_bounds[1] + term2) * (sigma_bounds[1] + term2);
 			}
 			
-			bounds[1] = psi_upper / psi_upper_divisor - squaresigma_lower / sigma_lower_divisor ; 
-			bounds[0] = psi_lower / psi_lower_divisor - squaresigma_upper / sigma_upper_divisor ; 
+			
+			bounds[1] = psi_upper/psi_upper_divisor - squaresigma_lower / sigma_lower_divisor ; 
+			bounds[0] = psi_lower/psi_lower_divisor - squaresigma_upper / sigma_upper_divisor ; 
+			
+			//bounds[0] =  squaresigma_lower / sigma_lower_divisor ;
+			//bounds[1] =  squaresigma_upper / sigma_upper_divisor ; 
 			
 			
 
@@ -182,6 +198,6 @@ public class Variance {
 	}
 
 	
-	
+	//select variance(value) from bigdata
 	
 }
