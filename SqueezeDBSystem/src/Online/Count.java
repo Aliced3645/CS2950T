@@ -36,10 +36,12 @@ public class Count {
 
 		Integer frequency = frequencies.get(target_value);
 		// estimate
-		if (frequency != null)
-			count = frequency * db_size / sample_size;
+		if (frequency == null)
+			return  0;
+		
+		count = frequency * db_size / sample_size;
 		return count;
-
+		
 	}
 
 	
@@ -74,7 +76,9 @@ public class Count {
 				{
 					v = frequencies.get(k);
 					v += 1;
-
+					if(k == 8)
+						System.out.println("88");
+					
 					frequencies.put(k, new Integer(v));
 				} else {
 					frequencies.put(k, new Integer(1));
@@ -86,6 +90,7 @@ public class Count {
 			while (it.hasNext()) {
 				Entry<Integer, Integer> entry = (Entry<Integer, Integer>) it
 						.next();
+				
 				selectivities
 						.put(entry.getKey(), new Float((float) entry.getValue()
 								/ (float) sampleSize));
@@ -100,14 +105,14 @@ public class Count {
 				bounds[1] = 0;
 				return bounds;
 			}
-			
+			System.out.println("adsjkl");
 			solution_max = CountSolver.solveCount(target_value, query_selectivity, selectivities, target_selectivity, eta, epsilon, true);
 			solution_min = CountSolver.solveCount(target_value, query_selectivity, selectivities, target_selectivity, eta, epsilon, false);
 			
 		
 			bounds[0] = solution_min.objective_value * dbSize;
 			bounds[1] = solution_max.objective_value * dbSize;
-
+			
 		} catch (Exception e) {
 			e.printStackTrace(System.out);
 			// System.out.println(e.getMessage());

@@ -101,7 +101,8 @@
 			estimatedValueCount = Count.process(rs, lineNumber, 1000000, target_value);
 			rs.first();
 			bounds = Count.calculateCountConfidenceInterval(rs, lineNumber, 1000000, epsilon, target_value);
-			
+			bounds[0] += estimatedValueCount;
+			bounds[1] += estimatedValueCount;
 		}
 		
 		
