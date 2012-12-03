@@ -33,7 +33,6 @@ public class Variance {
 				frequencies.put(k, new Integer(++v));
 			} else
 				frequencies.put(k, new Integer(1));
-
 		}
 
 		Iterator<Map.Entry<Integer, Integer>> it = frequencies.entrySet()
@@ -41,8 +40,10 @@ public class Variance {
 		while (it.hasNext()){
 			  Entry<Integer, Integer> entry = (Entry<Integer, Integer>) it.next();
 			  
+			  //estimated frequency in original dataset
 			  size_minus_1 += entry.getValue()  / (double) sample_size * db_size;  
 			    
+			  
 			  term1 += (entry.getKey() * entry.getKey()) * (entry.getValue() / (double) sample_size) * db_size;
 			  
 			  term2 += entry.getKey() * (entry.getValue() / (double) sample_size) * db_size;
@@ -52,7 +53,7 @@ public class Variance {
 		size_minus_1 -= 1;
 		squaresize_minus_size = size_minus_1 * (size_minus_1 + 1);
 		term2 = term2 * term2;
-		variance = size_minus_1 * term1 - squaresize_minus_size * term2;
+		variance =  term1 / size_minus_1  - term2 / squaresize_minus_size ;
 		
 		Variance.term1 = term1;
 		Variance.term2 = term2;
@@ -104,7 +105,6 @@ public class Variance {
 			// calculate selectivity: the percentage of a value appears in the
 			// sampled dataset
 			selectivity = new double[max - min + 1];
-
 			for (int i = min, index = 0; i <= max; i++, index++) {
 				v = frequencies.get(new Integer(i));
 
@@ -166,7 +166,7 @@ public class Variance {
 			    squaresigma_upper = (sigma_bounds[0] + term2) * (sigma_bounds[0] + term2);
 			    squaresigma_lower = (sigma_bounds[1] + term2) * (sigma_bounds[1] + term2);
 			}
-			  
+			
 			bounds[1] = psi_upper / psi_upper_divisor - squaresigma_lower / sigma_lower_divisor ; 
 			bounds[0] = psi_lower / psi_lower_divisor - squaresigma_upper / sigma_upper_divisor ; 
 			

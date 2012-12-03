@@ -21,8 +21,9 @@ public class Avg {
 		Integer k;
 		Integer v;
 
+		long sum = 0;
 		double avg = 0;
-
+		
 		while (result.next()) {
 			k = new Integer(result.getInt("value"));// sum first column
 			if (frequencies.containsKey(k)) {
@@ -32,16 +33,16 @@ public class Avg {
 				frequencies.put(k, new Integer(1));
 
 		}
-		long sum = 0;
-		double query_selectivity = 0;
+
 		Iterator<Map.Entry<Integer, Integer>> it = frequencies.entrySet()
 				.iterator();
 		while (it.hasNext()) {
 			Entry<Integer, Integer> entry = (Entry<Integer, Integer>) it.next();
-			sum += entry.getKey() * (entry.getValue() / (double) sample_size);
-			query_selectivity += entry.getValue() / (double) sample_size;
+			sum += entry.getKey() * (entry.getValue() / (double) sample_size)
+					* db_size;
 		}
-		avg = sum / query_selectivity;
+		
+		avg = sum / db_size;
 
 		return avg;
 	}

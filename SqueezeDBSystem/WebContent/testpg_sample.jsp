@@ -66,6 +66,8 @@
 		double[] bounds = new double[2];
 		long estimatedValueSum = 0;
 		double estimatedValueAvg = 0;
+		double estimatedValueVariance = 0;
+		
 		//try to calculate the confidence interval
 		if(aggregator.name.equals("sum")){
 			bounds = Sum.calculateSumConfidenceInterval(rs, lineNumber, 1000000, epsilon);
@@ -82,7 +84,9 @@
 			bounds[1] += estimatedValueAvg;
 		}
 		else if(aggregator.name.equals("variance")){
-			
+			estimatedValueVariance = Variance.process(rs, lineNumber, 1000000);
+			rs.first();
+			bounds = Variance.calculateVarianceConfidenceInterval(rs, lineNumber, 1000000, epsilon);
 		}
 		
 		
@@ -100,6 +104,8 @@
 				<td><%=estimatedValueSum%></td>
 			<%} else if (aggregator.name.equals("avg")) {%>
 				<td><%=estimatedValueAvg%></td>
+			<%} else if (aggregator.name.equals("variance")) {%>
+				<td><%=estimatedValueVariance%></td>
 			<%} %>			
 		</tr>
 		
