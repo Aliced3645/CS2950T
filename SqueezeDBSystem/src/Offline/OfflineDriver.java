@@ -77,7 +77,7 @@ class OriginalDataGenerator{
 		}
 		
 		bw.close();
-		System.out.println("Create File Down");
+		System.out.println("Create File Done");
 		
 		return 0;
 	}
