@@ -3,12 +3,13 @@ package Online;
 public class SqlRegenerator {
 	public static String regenerate(String originSQL, String tableName) {
 		String[] sql = originSQL.split(" ");
-		String sql_sentence;
-		//if(sql.length == 6)
-        //   sql_sentence = sql[0] + " * " + sql[2] + " " + tableName + " " + sql[4] + " " + sql[5];
-        //else
-            sql_sentence = sql[0] + " * " + sql[2] + " " + tableName;
-		return sql_sentence;
-		
+  		String sql_sentence;
+  		int where = 0;
+  		for(int i = 0; i < sql.length; i++) {
+  			if(sql[i].equals("where")) where = i;
+  		}
+  		if(where == 0) sql_sentence = "select * from " + tableName;
+  		else sql_sentence = "select * from " + tableName + " where " + sql[where + 1];
+  		return sql_sentence;
 	}
 }
