@@ -27,7 +27,8 @@ class OriginalMultiTableDataGenerator{
 		String dropQuery = "DROP TABLE IF EXISTS " + tablename + ";";
 		st.executeUpdate(dropQuery);
 		String createQuery = null;
-		if(tablename.equals("a")){
+		
+		if(tablename.equals("a")){ 
 			createQuery = "CREATE TABLE a (ai integer NOT NULL PRIMARY KEY, av integer NOT NULL, " +
 					"bi integer, FOREIGN KEY(bi) REFERENCES b(bi)) ;";
 		}
@@ -40,6 +41,22 @@ class OriginalMultiTableDataGenerator{
 			createQuery = "CREATE TABLE c (ci integer, cv integer, PRIMARY KEY(ci));";
 		}
 		st.executeUpdate(createQuery);
+		
+		//also create small temp tables for later join operation..
+		if(tablename.equals("a")){ 
+			createQuery = "CREATE TABLE at (ai integer NOT NULL PRIMARY KEY, av integer NOT NULL, " +
+					"bi integer, FOREIGN KEY(bi) REFERENCES b(bi)) ;";
+		}
+		else if(tablename.equals("b")){
+			createQuery = "CREATE TABLE bt (bi integer NOT NULL PRIMARY KEY, bv integer NOT NULL, " +
+					"ci integer, FOREIGN KEY(ci) REFERENCES c(ci)) ;";
+			
+		}
+		else if(tablename.equals("c")){
+			createQuery = "CREATE TABLE ct (ci integer, cv integer, PRIMARY KEY(ci));";
+		}
+		st.executeUpdate(createQuery);
+		
 		String insertString;
 		
 		int batchlimit = 10000;
@@ -61,6 +78,7 @@ class OriginalMultiTableDataGenerator{
 		st.executeBatch();
 		st.clearBatch();
 		st.close();		
+		System.out.println("Create table " + tablename + " done");
 		return 0;
 		
 	}
@@ -152,8 +170,6 @@ class OriginalMultiTableDataGenerator{
 	}
 	
 }
-
-
 public class OfflineDriverMultiTables {
 	public static String dbName = "db.cs.brown.edu/squeezedb";
 	public static String userName = "szhang";
@@ -173,9 +189,15 @@ public class OfflineDriverMultiTables {
 	public static void main(String[] args) throws ClassNotFoundException, SQLException, IOException {
 		Connection conn = OfflineDriverMultiTables.connectToOriginalDB();
 		//generate files
-		OriginalMultiTableDataGenerator.sqlGeneratorC("OriginalSqlQueryC");
-		OriginalMultiTableDataGenerator.sqlGeneratorB("OriginalSqlQueryB");
-		OriginalMultiTableDataGenerator.sqlGeneratorA("OriginalSqlQueryA");
+//		OriginalMultiTableDataGenerator.sqlGeneratorC("OriginalSqlQueryC");
+//		OriginalMultiTableDataGenerator.sqlGeneratorB("OriginalSqlQueryB");
+//		OriginalMultiTableDataGenerator.sqlGeneratorA("OriginalSqlQueryA");
+//		OriginalMultiTableDataGenerator.generateRandomDataset(conn, "OriginalSqlQueryC", "c");
+//		OriginalMultiTableDataGenerator.generateRandomDataset(conn, "OriginalSqlQueryB", "b");
+//		OriginalMultiTableDataGenerator.generateRandomDataset(conn, "OriginalSqlQueryA", "a");
+		
+		//sample sentences basing on sample sizes
+		
 		
 	}
 }
