@@ -103,10 +103,8 @@ public class DatabaseSampler {
 				String to_wirte = sampleSqlString + tuple.substring(startDataIndex);
 				
 				out.write(to_wirte+ "\n");
-			}
-				
+			}		
 		}
-
 		out.close();
 		return DatabaseSampler.SampleSize;
 	}

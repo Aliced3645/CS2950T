@@ -16,6 +16,29 @@ import java.util.Random;
 
 class SampleSizeCalculatorMutliTables {
 
+	public static int calculateVCDimension(int columns, int booleans) {
+		if (columns == 1) {
+			return 2 * booleans;
+		} else {
+			if (booleans == 1)
+				return columns + 1;
+			else {
+				return (int) Math.floor((2 * (columns + 1) * booleans * (Math
+						.log((columns + 1) * booleans) / Math.log(2))));
+			}
+		}
+	}
+	
+	public static int calculateSampleSizeInner(double eps, double delta, int vcd) {
+		return (int) Math.ceil(0.5 / (eps * eps) * (vcd + Math.log(1 / delta)));
+	}
+
+	public static int calculateSampleSize(int columns, int booleans,double eps, double delta){
+		int vcd = SampleSizeCalculatorMutliTables.calculateVCDimension(columns, booleans);
+		int size = SampleSizeCalculatorMutliTables.calculateSampleSizeInner(eps, delta, vcd);
+		return size;
+	}
+		
 }
 
 public class DatabaseSamplerMultiTables {
@@ -48,8 +71,15 @@ public class DatabaseSamplerMultiTables {
 		rand = new Random();
 		// randomly sample s tuples
 		for (int i = 0; i < sample_size; i++) {
-			random_tuple = rand.nextInt(db_size);
-			rows_sampled[random_tuple]++;
+			int ok = 0;
+			while(ok == 0){
+				random_tuple = rand.nextInt(db_size);
+				//rows_sampled[random_tuple]++;
+				if(rows_sampled[random_tuple] == 0){
+					ok = 1;
+					rows_sampled[random_tuple] = 1;
+				}
+			}
 		}
 
 		int firstTime = 0;
@@ -59,8 +89,10 @@ public class DatabaseSamplerMultiTables {
 			if (firstTime == 0) {
 				// get the index starting for the value
 				for (int j = 0; j < tuple.length(); j++) {
-					if (tuple.charAt(j) == '(')
+					if (tuple.charAt(j) == '('){
 						startDataIndex = j;
+						break;
+					}
 				}
 				firstTime = 1;
 			}
@@ -94,23 +126,23 @@ public class DatabaseSamplerMultiTables {
 		DataInputStream in = new DataInputStream(fstream);
 		BufferedReader br = new BufferedReader(new InputStreamReader(in));
 		while ((insertString = br.readLine()) != null) {
-
-			st.addBatch(insertString);
-			if (lineCounter % batchlimit == 0) {
-				st.executeBatch();
-				st.clearBatch();
-			}
-			lineCounter++;
+			st.executeUpdate(insertString);
+//			st.addBatch(insertString);
+//			if (lineCounter % batchlimit == 0) {
+//				st.executeBatch();
+//				st.clearBatch();
+//			}
+//			lineCounter++;
 		}
-		st.executeBatch();
-		st.clearBatch();
+//		st.executeBatch();
+///		st.clearBatch();
 
 		// create a sample joined table!
 		String createQuery;
 		createQuery = "CREATE TABLE "
 				+ sampleTableName
 				+ " as ("
-				+ "select at.*, b.bv, b.ci, c.cv from a,b,c where at.bi = b.bi and b.ci = c.ci);";
+				+ "select at.*, b.bv, b.ci, c.cv from at,b,c where at.bi = b.bi and b.ci = c.ci);";
 		st.executeUpdate(createQuery);
 		st.close();
 		return 0;
@@ -145,10 +177,8 @@ public class DatabaseSamplerMultiTables {
 
 		// create a sample joined table!
 		String createQuery;
-		createQuery = "CREATE TABLE "
-				+ sampleTableName
-				+ " as ("
-				+ "select bt.*, c.cv from b,c where bt.ci = c.ci);";
+		createQuery = "CREATE TABLE " + sampleTableName + " as ("
+				+ "select bt.*, c.cv from bt,c where bt.ci = c.ci);";
 		st.executeUpdate(createQuery);
 		st.close();
 		return 0;
@@ -156,7 +186,7 @@ public class DatabaseSamplerMultiTables {
 
 	public static int createSampleTableC(Connection conn, String sqlFile,
 			String sampleTableName) throws SQLException, IOException {
-		
+
 		Statement st = conn.createStatement();
 		String dropQuery = "DROP TABLE IF EXISTS " + sampleTableName + ";";
 		st.executeUpdate(dropQuery);
@@ -183,13 +213,11 @@ public class DatabaseSamplerMultiTables {
 
 		// create a sample joined table!
 		String createQuery;
-		createQuery = "CREATE TABLE "
-				+ sampleTableName
-				+ " as ("
-				+ "select ct.* from c);";
+		createQuery = "CREATE TABLE " + sampleTableName + " as ("
+				+ "select ct.* from ct);";
 		st.executeUpdate(createQuery);
 		st.close();
 		return 0;
-		
+
 	}
 }

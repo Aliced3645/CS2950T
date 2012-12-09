@@ -174,6 +174,9 @@ public class OfflineDriverMultiTables {
 	public static String dbName = "db.cs.brown.edu/squeezedb";
 	public static String userName = "szhang";
 	public static String password = "36453645Zs";
+	public static int sampleRowNumberLow = 1027;
+	public static int sampleRowNumberMid = 2309;
+	public static int sampleRowNumberHigh = 9235;
 	
 	//3 sample table names, for accuracy: low, mid, high
 	public static Connection connectToOriginalDB() throws ClassNotFoundException, SQLException{
@@ -189,14 +192,39 @@ public class OfflineDriverMultiTables {
 	public static void main(String[] args) throws ClassNotFoundException, SQLException, IOException {
 		Connection conn = OfflineDriverMultiTables.connectToOriginalDB();
 		//generate files
-//		OriginalMultiTableDataGenerator.sqlGeneratorC("OriginalSqlQueryC");
-//		OriginalMultiTableDataGenerator.sqlGeneratorB("OriginalSqlQueryB");
-//		OriginalMultiTableDataGenerator.sqlGeneratorA("OriginalSqlQueryA");
-//		OriginalMultiTableDataGenerator.generateRandomDataset(conn, "OriginalSqlQueryC", "c");
-//		OriginalMultiTableDataGenerator.generateRandomDataset(conn, "OriginalSqlQueryB", "b");
-//		OriginalMultiTableDataGenerator.generateRandomDataset(conn, "OriginalSqlQueryA", "a");
+		OriginalMultiTableDataGenerator.sqlGeneratorC("OriginalSqlQueryC");
+		OriginalMultiTableDataGenerator.sqlGeneratorB("OriginalSqlQueryB");
+		OriginalMultiTableDataGenerator.sqlGeneratorA("OriginalSqlQueryA");
+		OriginalMultiTableDataGenerator.generateRandomDataset(conn, "OriginalSqlQueryC", "c");
+		OriginalMultiTableDataGenerator.generateRandomDataset(conn, "OriginalSqlQueryB", "b");
+		OriginalMultiTableDataGenerator.generateRandomDataset(conn, "OriginalSqlQueryA", "a");
+		
+		
+		//test the new VC-dimension..
+		//pass
 		
 		//sample sentences basing on sample sizes
+		//low
+		DatabaseSamplerMultiTables.sampleSqlSentence(OfflineDriverMultiTables.sampleRowNumberLow, "OriginalSqlQueryA", "SampledQueryALow", "at");
+		DatabaseSamplerMultiTables.createSampleTableA(conn, "SampledQueryALow", "aj_l");
+		DatabaseSamplerMultiTables.sampleSqlSentence(OfflineDriverMultiTables.sampleRowNumberLow, "OriginalSqlQueryB", "SampledQueryBLow", "bt");
+		DatabaseSamplerMultiTables.createSampleTableB(conn, "SampledQueryBLow", "bj_l");
+		DatabaseSamplerMultiTables.sampleSqlSentence(OfflineDriverMultiTables.sampleRowNumberLow, "OriginalSqlQueryC", "SampledQueryCLow", "ct");
+		DatabaseSamplerMultiTables.createSampleTableC(conn, "SampledQueryCLow", "cj_l");
+		//mid
+		DatabaseSamplerMultiTables.sampleSqlSentence(OfflineDriverMultiTables.sampleRowNumberMid, "OriginalSqlQueryA", "SampledQueryAMid", "at");
+		DatabaseSamplerMultiTables.createSampleTableA(conn, "SampledQueryAMid", "aj_m");
+		DatabaseSamplerMultiTables.sampleSqlSentence(OfflineDriverMultiTables.sampleRowNumberMid, "OriginalSqlQueryB", "SampledQueryBMid", "bt");
+		DatabaseSamplerMultiTables.createSampleTableB(conn, "SampledQueryBMid", "bj_m");
+		DatabaseSamplerMultiTables.sampleSqlSentence(OfflineDriverMultiTables.sampleRowNumberMid, "OriginalSqlQueryC", "SampledQueryCMid", "ct");
+		DatabaseSamplerMultiTables.createSampleTableC(conn, "SampledQueryCMid", "cj_m");
+		//high
+		DatabaseSamplerMultiTables.sampleSqlSentence(OfflineDriverMultiTables.sampleRowNumberHigh, "OriginalSqlQueryA", "SampledQueryAHigh", "at");
+		DatabaseSamplerMultiTables.createSampleTableA(conn, "SampledQueryAHigh", "aj_h");
+		DatabaseSamplerMultiTables.sampleSqlSentence(OfflineDriverMultiTables.sampleRowNumberHigh, "OriginalSqlQueryB", "SampledQueryBHigh", "bt");
+		DatabaseSamplerMultiTables.createSampleTableB(conn, "SampledQueryBHigh", "bj_h");
+		DatabaseSamplerMultiTables.sampleSqlSentence(OfflineDriverMultiTables.sampleRowNumberHigh, "OriginalSqlQueryC", "SampledQueryCHigh", "ct");
+		DatabaseSamplerMultiTables.createSampleTableC(conn, "SampledQueryCHigh", "cj_h");
 		
 		
 	}
