@@ -1,5 +1,6 @@
 package Online;
 
+
 public class SqlRegenerator {
 	public static String regenerate(String originSQL, String tableName) {
 		String[] sql = originSQL.split(" ");

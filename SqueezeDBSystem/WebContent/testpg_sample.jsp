@@ -1,5 +1,6 @@
 <%@page import="Offline.DatabaseSampler"%>
 <%@page import="Offline.OfflineDriver"%>
+<%@page import="Offline.OfflineDriverMultiTables"%>
 <%@page import="java.sql.*"%>
 <%@page import="java.util.*"%>
 <%@page import="java.util.Properties"%>
@@ -27,33 +28,41 @@
 				.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
 						ResultSet.CONCUR_UPDATABLE);
 		String originSQL = request.getParameter("sqlInput");
+		String originTable = tableParser.getTableName(originSQL);
 		String inputRadio = request.getParameter("accuracy");
 		int sampleSize;
 		double epsilon = 0;
-		String tableName;
+		String tableName = null;
 		int lineNumber;
 		if (!inputRadio.isEmpty()) {
 			if (inputRadio.equals("highAccuracy")) {
-				tableName = OfflineDriver.sampleTableHigh;
-				lineNumber = OfflineDriver.sampleRowNumberHigh;
+				if(originTable.equals("a")) tableName = "aj_h";
+				else if(originTable.equals("b")) tableName = "bj_h";
+				else if(originTable.equals("c")) tableName = "cj_h";
+				lineNumber = OfflineDriverMultiTables.sampleRowNumberHigh;
 				epsilon = 0.1;
 			} else if (inputRadio.equals("middleAccuracy")) {
-				tableName = OfflineDriver.sampleTableMid;
-				lineNumber = OfflineDriver.sampleRowNumberMid;
+				if(originTable.equals("a")) tableName = "aj_m";
+				else if(originTable.equals("b")) tableName = "bj_m";
+				else if(originTable.equals("c")) tableName = "cj_m";
+				lineNumber = OfflineDriverMultiTables.sampleRowNumberMid;
 				epsilon = 0.2;
 			} else if (inputRadio.equals("lowAccuracy")) {
-				tableName = OfflineDriver.sampleTableLow;
-				lineNumber = OfflineDriver.sampleRowNumberLow;
+				if(originTable.equals("a")) tableName = "aj_l";
+				else if(originTable.equals("b")) tableName = "bj_l";
+				else if(originTable.equals("c")) tableName = "cj_l";
+				lineNumber = OfflineDriverMultiTables.sampleRowNumberLow;
 				epsilon = 0.3;
 			} else {
-				tableName = "bigdata";
-				lineNumber = 1000000;
+				tableName = "a";
+				lineNumber = 100000;
 			}
 		}
 		else{
-			tableName = "bigdata";
-			lineNumber = 1000000;
+			tableName = "a";
+			lineNumber = 100000;
 		}
+		
 		Aggregator aggregator = new Aggregator();
 		aggregator.getAggregator(originSQL);
 		String sql_sentence = SqlRegenerator.regenerate(originSQL, tableName);
@@ -71,23 +80,23 @@
 		
 		//try to calculate the confidence interval
 		if(aggregator.name.equals("sum")){
-			bounds = Sum.calculateSumConfidenceInterval(rs, lineNumber, 1000000, epsilon);
+			bounds = Sum.calculateSumConfidenceInterval(rs, lineNumber, 100000, epsilon);
 			rs.first();
 			estimatedValueSum = Sum.process(rs, lineNumber, 1000000);
 			bounds[0] += estimatedValueSum;
 			bounds[1] += estimatedValueSum;
 		}
 		else if(aggregator.name.equals("avg")){
-			bounds = Avg.calculateAvgConfidenceInterval(rs, lineNumber, 1000000, epsilon);
+			bounds = Avg.calculateAvgConfidenceInterval(rs, lineNumber, 100000, epsilon);
 			rs.first();
 			estimatedValueAvg = Avg.process(rs, lineNumber, 1000000);
 			bounds[0] += estimatedValueAvg;
 			bounds[1] += estimatedValueAvg;
 		}
 		else if(aggregator.name.equals("variance")){
-			estimatedValueVariance = Variance.process(rs, lineNumber, 1000000);
+			estimatedValueVariance = Variance.process(rs, lineNumber, 100000);
 			rs.first();
-			bounds = Variance.calculateVarianceConfidenceInterval(rs, lineNumber, 1000000, epsilon);
+			bounds = Variance.calculateVarianceConfidenceInterval(rs, lineNumber, 100000, epsilon);
 		}
 		else if(aggregator.name.equals("count")){
 			//get the value to query
@@ -98,9 +107,9 @@
 			}
 			String numStr = originSQL.substring(startIndex + 1);
 			target_value = Integer.parseInt(numStr);
-			estimatedValueCount = Count.process(rs, lineNumber, 1000000, target_value);
+			estimatedValueCount = Count.process(rs, lineNumber, 100000, target_value);
 			rs.first();
-			bounds = Count.calculateCountConfidenceInterval(rs, lineNumber, 1000000, epsilon, target_value);
+			bounds = Count.calculateCountConfidenceInterval(rs, lineNumber, 100000, epsilon, target_value);
 			bounds[0] += estimatedValueCount;
 			bounds[1] += estimatedValueCount;
 		}

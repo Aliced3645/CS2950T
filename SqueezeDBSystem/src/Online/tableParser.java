@@ -15,7 +15,7 @@ public class tableParser {
 	
 	public static void main(String[] args) throws ClassNotFoundException, SQLException, IOException {
 		//test the performance
-		String sentance = "select av from aasdf";
+		String sentance = "select av from a";
 		System.out.println(tableParser.getTableName(sentance));
 	}
 }

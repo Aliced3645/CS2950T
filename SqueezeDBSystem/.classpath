@@ -14,5 +14,6 @@
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.web.container"/>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
 	<classpathentry kind="lib" path="/local/projects/cplex/cplex/cplex123/i686/lib/cplex.jar"/>
+	<classpathentry kind="lib" path="/gpfs/main/home/szhang/git/CS2950T/zql.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
