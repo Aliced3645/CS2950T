@@ -1,6 +1,8 @@
+<%@page import="Zql.*" language="java"%>
 <%@page import="Offline.DatabaseSampler"%>
 <%@page import="Offline.OfflineDriver"%>
 <%@page import="Offline.OfflineDriverMultiTables"%>
+<%@page import="Online.AggregatorPair"%>
 <%@page import="java.sql.*"%>
 <%@page import="java.util.*"%>
 <%@page import="java.util.Properties"%>
@@ -65,12 +67,15 @@
 		
 		Aggregator aggregator = new Aggregator();
 		aggregator.getAggregator(originSQL);
-		String sql_sentence = SqlRegenerator.regenerate(originSQL, tableName);
+		//parsed!
+		Iterator<AggregatorPair> it = aggregator.aggregators.iterator();
+		String sql_sentence = SqlRegenerator.regenerate(originSQL, tableName);	
 		long start = System.nanoTime();
 		ResultSet rs = stmt.executeQuery(sql_sentence);
 		long end = System.nanoTime();
 		long interval = end - start;
 		int target_value = 0;
+		System.out.println(sql_sentence);
 		
 		double[] bounds = new double[2];
 		long estimatedValueSum = 0;
@@ -78,27 +83,29 @@
 		double estimatedValueVariance = 0;
 		long estimatedValueCount = 0;
 		
+		//just test first
+		AggregatorPair ap = it.next();
 		//try to calculate the confidence interval
-		if(aggregator.name.equals("sum")){
-			bounds = Sum.calculateSumConfidenceInterval(rs, lineNumber, 100000, epsilon);
+		if(ap.aggregator.equals("sum")){
+			estimatedValueSum = Sum.process(rs, ap.column, lineNumber, 100000);
 			rs.first();
-			estimatedValueSum = Sum.process(rs, lineNumber, 1000000);
+			bounds = Sum.calculateSumConfidenceInterval(rs, ap.column, lineNumber, 100000, epsilon);
 			bounds[0] += estimatedValueSum;
 			bounds[1] += estimatedValueSum;
 		}
-		else if(aggregator.name.equals("avg")){
-			bounds = Avg.calculateAvgConfidenceInterval(rs, lineNumber, 100000, epsilon);
+		else if(ap.aggregator.equals("avg")){
+			bounds = Avg.calculateAvgConfidenceInterval(rs, ap.column,lineNumber, 100000, epsilon);
 			rs.first();
-			estimatedValueAvg = Avg.process(rs, lineNumber, 1000000);
+			estimatedValueAvg = Avg.process(rs, ap.column, lineNumber, 100000);
 			bounds[0] += estimatedValueAvg;
 			bounds[1] += estimatedValueAvg;
 		}
-		else if(aggregator.name.equals("variance")){
-			estimatedValueVariance = Variance.process(rs, lineNumber, 100000);
+		else if(ap.aggregator.equals("variance")){
+			estimatedValueVariance = Variance.process(rs, ap.column,lineNumber, 100000);
 			rs.first();
-			bounds = Variance.calculateVarianceConfidenceInterval(rs, lineNumber, 100000, epsilon);
+			bounds = Variance.calculateVarianceConfidenceInterval(rs, ap.column,lineNumber, 100000, epsilon);
 		}
-		else if(aggregator.name.equals("count")){
+		else if(ap.aggregator.equals("count")){
 			//get the value to query
 			int startIndex = 0, endIndex = 0;
 			for(int i = 0; i < originSQL.length(); i ++){
@@ -107,9 +114,9 @@
 			}
 			String numStr = originSQL.substring(startIndex + 1);
 			target_value = Integer.parseInt(numStr);
-			estimatedValueCount = Count.process(rs, lineNumber, 100000, target_value);
+			estimatedValueCount = Count.process(rs, ap.column,lineNumber, 100000, target_value);
 			rs.first();
-			bounds = Count.calculateCountConfidenceInterval(rs, lineNumber, 100000, epsilon, target_value);
+			bounds = Count.calculateCountConfidenceInterval(rs, ap.column,lineNumber, 100000, epsilon, target_value);
 			bounds[0] += estimatedValueCount;
 			bounds[1] += estimatedValueCount;
 		}
@@ -125,13 +132,13 @@
 		</tr>
 		<br\>
 		<tr>
-			<% if(aggregator.name.equals("sum")) {%>
+			<% if(ap.aggregator.equals("sum")) {%>
 				<td><%=estimatedValueSum%></td>
-			<%} else if (aggregator.name.equals("avg")) {%>
+			<%} else if (ap.aggregator.equals("avg")) {%>
 				<td><%=estimatedValueAvg%></td>
-			<%} else if (aggregator.name.equals("variance")) {%>
+			<%} else if (ap.aggregator.equals("variance")) {%>
 				<td><%=estimatedValueVariance%></td>
-			<%} else if (aggregator.name.equals("count")) {%>
+			<%} else if (ap.aggregator.equals("count")) {%>
 				<td><%=estimatedValueCount%></td>
 			<%} %>			
 		</tr>

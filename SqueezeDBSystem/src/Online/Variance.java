@@ -12,7 +12,8 @@ public class Variance {
 	static double term1;
 	static double term2;
 	
-	public static double process(ResultSet result, int sample_size, int db_size)
+	public static double process(ResultSet result, String columnName, 
+			int sample_size, int db_size)
 			throws SQLException {
 
 		double variance = 0;
@@ -27,7 +28,7 @@ public class Variance {
 
 
 		while (result.next()) {
-			k = new Integer(result.getInt("value"));// sum first column
+			k = new Integer(result.getInt(columnName));// sum first column
 			if (frequencies.containsKey(k)) {
 				v = frequencies.get(k);
 				frequencies.put(k, new Integer(++v));
@@ -65,7 +66,7 @@ public class Variance {
 	
 	
 	public static double[] calculateVarianceConfidenceInterval(ResultSet resultSet,
-			int sampleSize, int dbSize, double epsilon) {
+			String columnName, int sampleSize, int dbSize, double epsilon) {
 
 		// order: solution_min, solution_max ( confidence bounds )
 		double[] bounds = new double[2];
@@ -87,7 +88,7 @@ public class Variance {
 
 		try {
 			while (resultSet.next()) {
-				k = new Integer(resultSet.getInt("value"));
+				k = new Integer(resultSet.getInt(columnName));
 				// update max and min
 				if (k.intValue() > max)
 					max = k.intValue();

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <%@page import="java.sql.*"%>
+<%@page import="Zql.*"%>
 <%@page import="java.io.BufferedReader"%>
 <%@page import="java.io.BufferedWriter"%>
 <%@page import="java.io.DataInputStream"%>
@@ -615,7 +616,7 @@ oDiv.style.borderColor = "black";
 </script> 
 
 <textarea id="Text1" rows="10" cols="30" name="sqlInput" onfocus="this.value='';" onblur="ShowInfo();">
-Please input your SQL query.
+Please input your SQL query
 </textarea>
 </div>
 <div id="accuracyInput_div" style="height:200px;width:400px;float:left;relative: absolute; left: 100px; top: 100px;">

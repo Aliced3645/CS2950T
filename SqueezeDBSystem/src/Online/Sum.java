@@ -17,7 +17,7 @@ import java.util.Map.Entry;
 public class Sum {
 
 	// get the estimated sum
-	public static long process(ResultSet result, int sample_size, int db_size)
+	public static long process(ResultSet result, String columnName, int sample_size, int db_size)
 			throws SQLException {
 
 		HashMap<Integer, Integer> frequencies = new HashMap<Integer, Integer>();
@@ -27,7 +27,7 @@ public class Sum {
 		long sum = 0;
 
 		while (result.next()) {
-			k = new Integer(result.getInt("value"));// sum first column
+			k = new Integer(result.getInt(columnName));// sum first column
 			if (frequencies.containsKey(k)) {
 				v = frequencies.get(k);
 				frequencies.put(k, new Integer(++v));
@@ -48,7 +48,7 @@ public class Sum {
 	}
 
 	public static double[] calculateSumConfidenceInterval(ResultSet resultSet,
-			int sampleSize, int dbSize, double epsilon) {
+			String columnName, int sampleSize, int dbSize, double epsilon) {
 
 		// order: solution_min, solution_max ( confidence bounds )
 		double[] bounds = new double[2];
@@ -68,7 +68,7 @@ public class Sum {
 
 		try {
 			while (resultSet.next()) {
-				k = new Integer(resultSet.getInt("value"));
+				k = new Integer(resultSet.getInt(columnName));
 				// update max and min
 				if (k.intValue() > max)
 					max = k.intValue();

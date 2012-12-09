@@ -8,10 +8,6 @@ import java.util.Vector;
 
 import Zql.*;
 
-class AggregatorPair{
-	public String aggregator;
-	public String column;
-}
 
 public class Aggregator {
 	public String name;
@@ -54,7 +50,7 @@ public class Aggregator {
 	public static void main(String[] args) throws ClassNotFoundException, SQLException, IOException, ParseException {
 		
 		Aggregator ag = new Aggregator();
-		ag.getAggregator("SELECT SUM(av),AVG(bv) FROM a,b WHERE a.bi = b.bi;");
+		ag.getAggregator("select sum(av),avg(bv) from a,b where a.bi = b.bi;");
 		Iterator<AggregatorPair> it = ag.aggregators.iterator();
 		while(it.hasNext()){
 			AggregatorPair ap = it.next();

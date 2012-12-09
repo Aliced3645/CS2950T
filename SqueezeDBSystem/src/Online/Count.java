@@ -15,7 +15,7 @@ import java.util.Map.Entry;
 //select count(value) from bigdata where value=10
 
 public class Count {
-	public static long process(ResultSet result, int sample_size, int db_size,
+	public static long process(ResultSet result, String columnName,  int sample_size, int db_size,
 			int target_value) throws SQLException {
 
 		HashMap<Integer, Integer> frequencies = new HashMap<Integer, Integer>();
@@ -25,7 +25,7 @@ public class Count {
 		long count = 0;
 
 		while (result.next()) {
-			k = new Integer(result.getInt("value"));// sum first column
+			k = new Integer(result.getInt(columnName));// sum first column
 			if (frequencies.containsKey(k)) {
 				v = frequencies.get(k);
 				frequencies.put(k, new Integer(++v));
@@ -47,7 +47,7 @@ public class Count {
 	
 	
 	public static double[] calculateCountConfidenceInterval(ResultSet resultSet,
-			int sampleSize, int dbSize, double epsilon, int target_value) {
+			String columnName, int sampleSize, int dbSize, double epsilon, int target_value) {
 		double[] bounds = new double[2];
 		CplexSolution solution_min = null;
 		CplexSolution solution_max = null;
@@ -65,7 +65,7 @@ public class Count {
 
 		try {
 			while (resultSet.next()) {
-				k = new Integer(resultSet.getInt("value"));
+				k = new Integer(resultSet.getInt(columnName));
 				// update max and min
 				if (k.intValue() > max)
 					max = k.intValue();
@@ -76,9 +76,6 @@ public class Count {
 				{
 					v = frequencies.get(k);
 					v += 1;
-					if(k == 8)
-						System.out.println("88");
-					
 					frequencies.put(k, new Integer(v));
 				} else {
 					frequencies.put(k, new Integer(1));
@@ -105,7 +102,6 @@ public class Count {
 				bounds[1] = 0;
 				return bounds;
 			}
-			System.out.println("adsjkl");
 			solution_max = CountSolver.solveCount(target_value, query_selectivity, selectivities, target_selectivity, eta, epsilon, true);
 			solution_min = CountSolver.solveCount(target_value, query_selectivity, selectivities, target_selectivity, eta, epsilon, false);
 			
@@ -115,7 +111,6 @@ public class Count {
 			
 		} catch (Exception e) {
 			e.printStackTrace(System.out);
-			// System.out.println(e.getMessage());
 		}
 
 		return bounds;

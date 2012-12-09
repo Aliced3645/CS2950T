@@ -14,7 +14,7 @@ import java.util.Map.Entry;
 
 public class Avg {
 
-	public static double process(ResultSet result, int sample_size, int db_size)
+	public static double process(ResultSet result, String columnName, int sample_size, int db_size)
 			throws SQLException {
 
 		HashMap<Integer, Integer> frequencies = new HashMap<Integer, Integer>();
@@ -25,7 +25,7 @@ public class Avg {
 		double avg = 0;
 		
 		while (result.next()) {
-			k = new Integer(result.getInt("value"));// sum first column
+			k = new Integer(result.getInt(columnName));// sum first column
 			if (frequencies.containsKey(k)) {
 				v = frequencies.get(k);
 				frequencies.put(k, new Integer(++v));
@@ -48,7 +48,7 @@ public class Avg {
 	}
 
 	public static double[] calculateAvgConfidenceInterval(ResultSet resultSet,
-			int sampleSize, int dbSize, double epsilon) {
+			String columnName, int sampleSize, int dbSize, double epsilon) {
 		double[] bounds = new double[2];
 		CplexSolution solution_min;
 		CplexSolution solution_max;
@@ -66,7 +66,7 @@ public class Avg {
 
 		try {
 			while (resultSet.next()) {
-				k = new Integer(resultSet.getInt("value"));
+				k = new Integer(resultSet.getInt(columnName));
 
 				// update max and min
 				if (k.intValue() > max)
