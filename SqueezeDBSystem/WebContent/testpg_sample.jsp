@@ -36,15 +36,15 @@
 			if (inputRadio.equals("highAccuracy")) {
 				tableName = OfflineDriver.sampleTableHigh;
 				lineNumber = OfflineDriver.sampleRowNumberHigh;
-				epsilon = 0.2;
+				epsilon = 0.1;
 			} else if (inputRadio.equals("middleAccuracy")) {
 				tableName = OfflineDriver.sampleTableMid;
 				lineNumber = OfflineDriver.sampleRowNumberMid;
-				epsilon = 0.5;
+				epsilon = 0.2;
 			} else if (inputRadio.equals("lowAccuracy")) {
 				tableName = OfflineDriver.sampleTableLow;
 				lineNumber = OfflineDriver.sampleRowNumberLow;
-				epsilon = 0.8;
+				epsilon = 0.3;
 			} else {
 				tableName = "bigdata";
 				lineNumber = 1000000;
