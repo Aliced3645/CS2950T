@@ -19,6 +19,9 @@
 <html>
 <body>
 
+	<table border='12'>
+		<caption>Query Result at SampleDB....</caption>
+		
 	<%
 		Class.forName("org.postgresql.Driver").newInstance();
 		String db_url = "jdbc:postgresql://db.cs.brown.edu/squeezedb";
@@ -82,83 +85,108 @@
 		double estimatedValueAvg = 0;
 		double estimatedValueVariance = 0;
 		long estimatedValueCount = 0;
-		
+		EstimatedResult er = new EstimatedResult();
 		//just test first
-		AggregatorPair ap = it.next();
-		//try to calculate the confidence interval
-		if(ap.aggregator.equals("sum")){
-			estimatedValueSum = Sum.process(rs, ap.column, lineNumber, 100000);
+		while(it.hasNext()){
+			AggregatorPair ap = it.next();
 			rs.first();
-			bounds = Sum.calculateSumConfidenceInterval(rs, ap.column, lineNumber, 100000, epsilon);
-			bounds[0] += estimatedValueSum;
-			bounds[1] += estimatedValueSum;
-		}
-		else if(ap.aggregator.equals("avg")){
-			bounds = Avg.calculateAvgConfidenceInterval(rs, ap.column,lineNumber, 100000, epsilon);
-			rs.first();
-			estimatedValueAvg = Avg.process(rs, ap.column, lineNumber, 100000);
-			bounds[0] += estimatedValueAvg;
-			bounds[1] += estimatedValueAvg;
-		}
-		else if(ap.aggregator.equals("variance")){
-			estimatedValueVariance = Variance.process(rs, ap.column,lineNumber, 100000);
-			rs.first();
-			bounds = Variance.calculateVarianceConfidenceInterval(rs, ap.column,lineNumber, 100000, epsilon);
-		}
-		else if(ap.aggregator.equals("count")){
-			//get the value to query
-			int startIndex = 0, endIndex = 0;
-			for(int i = 0; i < originSQL.length(); i ++){
-				if(originSQL.charAt(i) == '=')
-					startIndex = i;
+			//try to calculate the confidence interval
+			if(ap.aggregator.equals("sum")){
+				estimatedValueSum = Sum.process(rs, ap.column, lineNumber, 100000);
+				rs.first();
+				bounds = Sum.calculateSumConfidenceInterval(rs, ap.column, lineNumber, 100000, epsilon);
+				bounds[0] += estimatedValueSum;
+				bounds[1] += estimatedValueSum;
+				er.aggregateName.add("SUM");
+				er.upperBound.add(bounds[1]);
+				er.lowerBound.add(bounds[0]);
+				double k = estimatedValueSum;
+				er.estimatedValue.add(k);
 			}
-			String numStr = originSQL.substring(startIndex + 1);
-			target_value = Integer.parseInt(numStr);
-			estimatedValueCount = Count.process(rs, ap.column,lineNumber, 100000, target_value);
-			rs.first();
-			bounds = Count.calculateCountConfidenceInterval(rs, ap.column,lineNumber, 100000, epsilon, target_value);
-			bounds[0] += estimatedValueCount;
-			bounds[1] += estimatedValueCount;
+			else if(ap.aggregator.equals("avg")){
+				bounds = Avg.calculateAvgConfidenceInterval(rs, ap.column,lineNumber, 100000, epsilon);
+				rs.first();
+				estimatedValueAvg = Avg.process(rs, ap.column, lineNumber, 100000);
+				bounds[0] += estimatedValueAvg;
+				bounds[1] += estimatedValueAvg;
+				er.aggregateName.add("AVG");
+				er.upperBound.add(bounds[1]);
+				er.lowerBound.add(bounds[0]);
+				er.estimatedValue.add(estimatedValueAvg);
+			}
+			else if(ap.aggregator.equals("variance")){
+				estimatedValueVariance = Variance.process(rs, ap.column,lineNumber, 100000);
+				rs.first();
+				bounds = Variance.calculateVarianceConfidenceInterval(rs, ap.column,lineNumber, 100000, epsilon);
+				er.aggregateName.add("VAR");
+				er.upperBound.add(bounds[1]);
+				er.lowerBound.add(bounds[0]);
+				er.estimatedValue.add(estimatedValueVariance);
+			}
+			else if(ap.aggregator.equals("count")){
+				//get the value to query
+				//TODO:to modify
+				int startIndex = 0, endIndex = 0;
+				for(int i = 0; i < originSQL.length(); i ++){
+					if(originSQL.charAt(i) == '=')
+						startIndex = i;
+				}
+				String numStr = originSQL.substring(startIndex + 1);
+				target_value = Integer.parseInt(numStr);
+				estimatedValueCount = Count.process(rs, ap.column,lineNumber, 100000, target_value);
+				rs.first();
+				bounds = Count.calculateCountConfidenceInterval(rs, ap.column,lineNumber, 100000, epsilon, target_value);
+				bounds[0] += estimatedValueCount;
+				bounds[1] += estimatedValueCount;
+				er.aggregateName.add("COUNT");
+				er.upperBound.add(bounds[1]);
+				er.lowerBound.add(bounds[0]);
+				double k = estimatedValueCount;
+				er.estimatedValue.add(k);
+			}
 		}
+		%>
 		
-		
-	%>
-	
-	<table border='12'>
-		<caption>Query Result at SampleDB....</caption>
 		<tr>
 			<%=request.getParameter("sqlInput")%>
-			<th>Estimated <%=aggregator.name %></th>
+			<% Iterator<String> its = er.aggregateName.iterator();
+				while(its.hasNext()){
+					String aggregatename = its.next(); %>	
+				<th>Estimated <%=aggregatename %></th>
+			<% }%>
 		</tr>
 		<br\>
-		<tr>
-			<% if(ap.aggregator.equals("sum")) {%>
-				<td><%=estimatedValueSum%></td>
-			<%} else if (ap.aggregator.equals("avg")) {%>
-				<td><%=estimatedValueAvg%></td>
-			<%} else if (ap.aggregator.equals("variance")) {%>
-				<td><%=estimatedValueVariance%></td>
-			<%} else if (ap.aggregator.equals("count")) {%>
-				<td><%=estimatedValueCount%></td>
-			<%} %>			
-		</tr>
 		
 		<tr>
-			<th>Low Confidence Bound </th>
+			<% Iterator<Double> itd = er.estimatedValue.iterator();
+				while(itd.hasNext()){
+					double answer = itd.next(); %>	
+				<th><%=answer%></th>
+			<% }%>
 		</tr>
 		<br\>
+		
 		<tr>
-			<td><%=(long)bounds[0]%></td>
-		</tr>
-		<tr>
-			<th>High Confidence Bound </th>
+			<% Iterator<Double> itl = er.lowerBound.iterator();
+				while(itl.hasNext()){
+					double answer = itl.next(); %>	
+				<th><%=answer%></th>
+			<% }%>
 		</tr>
 		<br\>
+		
 		<tr>
-			<td><%=(long)bounds[1]%></td>
+			<% Iterator<Double> itu = er.upperBound.iterator();
+				while(itu.hasNext()){
+					double answer = itu.next(); %>	
+				<th><%=answer%></th>
+			<% }%>
 		</tr>
+		<br\>
 		
 	</table>
+	
+
 	<br\>
 	
 	<table border='3' bgcolor="green">
