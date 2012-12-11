@@ -148,6 +148,7 @@
 		%>
 		
 		<tr>
+			<th>Estimated Aggregator</th>
 			<%=request.getParameter("sqlInput")%>
 			<% Iterator<String> its = er.aggregateName.iterator();
 				while(its.hasNext()){
@@ -158,6 +159,7 @@
 		<br\>
 		
 		<tr>
+			<th>Estimated Value</th>
 			<% Iterator<Double> itd = er.estimatedValue.iterator();
 				while(itd.hasNext()){
 					double answer = itd.next(); %>	
@@ -167,6 +169,7 @@
 		<br\>
 		
 		<tr>
+			<th>Lower Bound</th>
 			<% Iterator<Double> itl = er.lowerBound.iterator();
 				while(itl.hasNext()){
 					double answer = itl.next(); %>	
@@ -176,6 +179,7 @@
 		<br\>
 		
 		<tr>
+			<th>Upper Bound</th>
 			<% Iterator<Double> itu = er.upperBound.iterator();
 				while(itu.hasNext()){
 					double answer = itu.next(); %>	
@@ -202,5 +206,6 @@
 		stmt.close();
 		conn.close();
 	%>
+
 </body>
 </html>

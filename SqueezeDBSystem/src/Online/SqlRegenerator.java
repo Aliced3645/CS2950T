@@ -1,31 +1,70 @@
 package Online;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.SQLException;
+import java.util.Iterator;
+import java.util.Vector;
 
 import Zql.ParseException;
+import Zql.ZExp;
+import Zql.ZExpression;
+import Zql.ZQuery;
+import Zql.ZqlParser;
 
 public class SqlRegenerator {
-	public static String regenerate(String originSQL, String tableName) {
-		String[] sql = originSQL.split(" ");
-		String sql_sentence;
-		// TODO: modify where later
-		// int where = 0;
-		// for(int i = 0; i < sql.length; i++) {
-		// if(sql[i].equals("where")) where = i;
-		// }
-		// if(where == 0)
-		sql_sentence = "select * from " + tableName + ";";
-		// else sql_sentence = "select * from " + tableName + " where " +
-		// sql[where + 1];
+
+
+	//parse the where portion recursively
+	public static boolean recursiveEqualFinder(ZExpression exp){
+		if(exp == null)
+			return false;
+		if(exp.getOperator().equals("=") == true)
+			return true;
+		Vector<ZExp> ops = exp.getOperands();
+		Iterator<ZExp> it = ops.iterator();
+		while (it.hasNext()) {
+			ZExp op = it.next();
+			if(! (op instanceof Zql.ZConstant))
+				if(recursiveEqualFinder((ZExpression) op) == true)
+					return true;
+		}
+		return false;
+	}
+	
+	public static String regenerate(String sql, String tableName) throws ParseException {
+		String sql_sentence = "select * from " + tableName;
+		InputStream is = new ByteArrayInputStream(sql.getBytes());
+		ZqlParser parser = new ZqlParser(is);
+		ZQuery statement = (ZQuery) parser.readStatement();
+		ZExpression wheres = (ZExpression) statement.getWhere();
+		if (wheres == null) {
+			sql_sentence += ";";
+		} 
+		else{
+			Vector<ZExpression> ops = wheres.getOperands();
+			Iterator<ZExpression> it = ops.iterator();
+			ZExpression modifiedWhere = new ZExpression("");
+			while (it.hasNext()) {		
+				ZExpression op = it.next();
+				if (SqlRegenerator.recursiveEqualFinder(op) == false) {
+					modifiedWhere.addOperand(op);
+				}
+			}
+			sql_sentence += " where ";
+			sql_sentence += modifiedWhere.toString() + ";";
+		}
 		return sql_sentence;
 	}
-
-	// test it
+	
 	public static void main(String[] args) throws ClassNotFoundException,
 			SQLException, IOException, ParseException {
-		String sql = "select sum(av),avg(bv) from a,b where a.bi = b.bi;";
-		String return_sql = SqlRegenerator.regenerate(sql, "aj_l");
-		System.out.println(return_sql);
+		 String sql =
+		 "select sum(av),avg(bv) from a,b,c where ((a.bi = b.bi) AND (b.ci = c.ci)) AND ((av < 5000) AND (bv < 5000 OR cv < 5000));";
+		String tableName = "aj_h";
+		String sql_sentence = "select * from " + tableName;
+		String result = SqlRegenerator.regenerate(sql, tableName);
+		System.out.println(result);
 	}
 }
