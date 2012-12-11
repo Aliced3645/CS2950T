@@ -43,27 +43,34 @@ public class SqlRegenerator {
 			sql_sentence += ";";
 		} 
 		else{
-			Vector<ZExpression> ops = wheres.getOperands();
-			Iterator<ZExpression> it = ops.iterator();
+			Vector<ZExp> ops = wheres.getOperands();
+			Iterator<ZExp> it = ops.iterator();
 			ZExpression modifiedWhere = new ZExpression("");
 			while (it.hasNext()) {		
-				ZExpression op = it.next();
-				if (SqlRegenerator.recursiveEqualFinder(op) == false) {
-					modifiedWhere.addOperand(op);
+				ZExp op = it.next();
+				if(! (op instanceof Zql.ZConstant)){
+					if (SqlRegenerator.recursiveEqualFinder((ZExpression) op) == false) {
+						modifiedWhere.addOperand(op);
+					}
 				}
 			}
-			sql_sentence += " where ";
-			sql_sentence += modifiedWhere.toString() + ";";
+			if(modifiedWhere.toString().length() != 2){
+				sql_sentence += " where ";
+				sql_sentence += modifiedWhere.toString() + ";";
+			}
+			else {
+				sql_sentence += ";";
+			}
 		}
 		return sql_sentence;
 	}
 	
 	public static void main(String[] args) throws ClassNotFoundException,
 			SQLException, IOException, ParseException {
-		 String sql =
-		 "select sum(av),avg(bv) from a,b,c where ((a.bi = b.bi) AND (b.ci = c.ci)) AND ((av < 5000) AND (bv < 5000 OR cv < 5000));";
+//		String sql =
+//		 "select sum(av),avg(bv),avg(cv) from a,b,c where ((a.bi = b.bi) AND (b.ci = c.ci)) AND ((av < 5000) AND (bv < 5000 OR cv < 5000));";
+		String sql = "select sum(av),avg(bv) from a,b where a.bi = b.bi;";
 		String tableName = "aj_h";
-		String sql_sentence = "select * from " + tableName;
 		String result = SqlRegenerator.regenerate(sql, tableName);
 		System.out.println(result);
 	}

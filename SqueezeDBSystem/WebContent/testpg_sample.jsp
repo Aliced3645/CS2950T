@@ -163,7 +163,7 @@
 			<% Iterator<Double> itd = er.estimatedValue.iterator();
 				while(itd.hasNext()){
 					double answer = itd.next(); %>	
-				<th><%=answer%></th>
+				<th><%=(long)answer%></th>
 			<% }%>
 		</tr>
 		<br\>
@@ -173,7 +173,7 @@
 			<% Iterator<Double> itl = er.lowerBound.iterator();
 				while(itl.hasNext()){
 					double answer = itl.next(); %>	
-				<th><%=answer%></th>
+				<th><%=(long)answer%></th>
 			<% }%>
 		</tr>
 		<br\>
@@ -183,7 +183,7 @@
 			<% Iterator<Double> itu = er.upperBound.iterator();
 				while(itu.hasNext()){
 					double answer = itu.next(); %>	
-				<th><%=answer%></th>
+				<th><%=(long)answer%></th>
 			<% }%>
 		</tr>
 		<br\>

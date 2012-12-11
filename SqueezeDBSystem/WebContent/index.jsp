@@ -71,7 +71,7 @@
 		Integer k = 0;
 		Integer v = 0;
 		//low	
-		String filePathL = application.getRealPath("FreqLow");
+		String filePathL = application.getRealPath("FreqLowA");
 		BufferedReader brL = new BufferedReader(new FileReader(filePathL));
 		int[] frequenciesLow = new int[10000];
 		
@@ -84,7 +84,7 @@
 		}
 		
 		//mid
-		String filePathM = application.getRealPath("FreqMid");
+		String filePathM = application.getRealPath("FreqMidA");
 		BufferedReader brM = new BufferedReader(new FileReader(filePathM));
 		int[] frequenciesMid = new int[10000];
 		//get the hashmap...
@@ -95,7 +95,7 @@
 			frequenciesMid[k] = v;
 		}
 		//high
-		String filePathH = application.getRealPath("FreqHigh");
+		String filePathH = application.getRealPath("FreqHighA");
 		BufferedReader brH = new BufferedReader(new FileReader(filePathH));
 		int[] frequenciesHigh = new int[10000];
 		//get the hashmap...
@@ -107,7 +107,7 @@
 		}
 		
 		//original
-		String filePathO = application.getRealPath("FreqO");
+		String filePathO = application.getRealPath("FreqOA");
 		BufferedReader brO = new BufferedReader(new FileReader(filePathO));
 		int[] frequenciesOigh = new int[10000];
 		//get the hashmap...
@@ -248,7 +248,7 @@ The three sample tables has different sizes, in principle, table with bigger siz
 	var center = 250;
 	var planets = new Array(4);
 	planets[0] = [ 100, 0, 0];
-	planets[1] = [ 36, 120, 3e-2];
+	planets[1] = [ 45, 120, 3e-2];
 	planets[2] = [ 10,  170,  2e-2];
 	planets[3] = [ 5,  185,  1e-2];
 	var start = Date.now();
@@ -269,7 +269,7 @@ The three sample tables has different sizes, in principle, table with bigger siz
 		if(d[0] == 100){
 			return "hsl(0, 53%, 58%)";
 		}
-		else if(d[0] == 36){
+		else if(d[0] == 45){
 			return "hsl(305, 70%, 45%)";
 		}
 		else if(d[0] == 10){
@@ -296,22 +296,22 @@ The three sample tables has different sizes, in principle, table with bigger siz
 			});
 			dataSizeToShow.text(function(){
 				if(d[0] == 100){
-					return "Dataset Size: 1000000";
+					return "Dataset Size: 100000";
 				}
-				else if(d[0] == 36){
-					return "Dataset Size: 18647";
+				else if(d[0] == 45){
+					return "Dataset Size: 9235";
 				}
 				else if(d[0] == 10){
-					return "Dataset Size: 2984";
+					return "Dataset Size: 2309";
 				}
 				else if(d[0] == 5){
-					return "Dataset Size: 1166";
+					return "Dataset Size: 1027";
 				}
 			}).attr("fill", function() {
 				if(d[0] == 100){
 					return "hsl(0, 53%, 58%)";
 				}
-				else if(d[0] == 36){
+				else if(d[0] == 45){
 					return "hsl(305, 70%, 45%)";
 				}
 				else if(d[0] == 10){
@@ -600,6 +600,11 @@ The three sample tables has different sizes, in principle, table with bigger siz
 
 <form id="submit_query_form" method ="POST">
 <br>
+<p>
+Sample Query:
+<br>
+select sum(av),avg(bv),avg(cv) from a,b,c where ((a.bi = b.bi) AND (b.ci = c.ci));
+</p>
 <div id="sqlInput_div" style="height:200px;width:500px;float:left;">
 <script type="text/javascript"> 
 

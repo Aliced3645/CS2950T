@@ -33,7 +33,7 @@ public class StatisticsCollector {
 		Integer v;
 
 		while (result.next()) {
-			k = new Integer(result.getInt("value"));// sum first column
+			k = new Integer(result.getInt("av"));// sum first column
 			if (frequencies.containsKey(k)) {
 				v = frequencies.get(k);
 				frequencies.put(k, new Integer(++v));
@@ -74,25 +74,25 @@ public class StatisticsCollector {
 		Connection conn = OfflineDriver.connectToOriginalDB();
 		Statement st = conn.createStatement();
 		
-		String queryO = "SELECT * FROM bigdata";
+		String queryO = "SELECT * FROM a";
 		ResultSet rsO = st.executeQuery(queryO);
 		Map<Integer,Integer> FrequencyO = StatisticsCollector.getFrequency(rsO);
-		StatisticsCollector.writeHashmapToFile(FrequencyO, "FreqO");
+		StatisticsCollector.writeHashmapToFile(FrequencyO, "FreqOA");
 		
-		String queryL = "SELECT * FROM sampledata08";
+		String queryL = "SELECT * FROM aj_l";
 		ResultSet rsL = st.executeQuery(queryL);
 		Map<Integer,Integer> FrequencyL = StatisticsCollector.getFrequency(rsL);
-		StatisticsCollector.writeHashmapToFile(FrequencyL, "FreqLow");
+		StatisticsCollector.writeHashmapToFile(FrequencyL, "FreqLowA");
 		
-		String queryM = "SELECT * FROM sampledata05";
+		String queryM = "SELECT * FROM aj_m";
 		ResultSet rsM = st.executeQuery(queryM);
 		Map<Integer,Integer> FrequencyM = StatisticsCollector.getFrequency(rsM);
-		StatisticsCollector.writeHashmapToFile(FrequencyM, "FreqMid");
+		StatisticsCollector.writeHashmapToFile(FrequencyM, "FreqMidA");
 		
-		String queryH = "SELECT * FROM sampledata02";
+		String queryH = "SELECT * FROM aj_h";
 		ResultSet rsH = st.executeQuery(queryH);
 		Map<Integer,Integer> FrequencyH = StatisticsCollector.getFrequency(rsH);
-		StatisticsCollector.writeHashmapToFile(FrequencyH, "FreqHigh");
+		StatisticsCollector.writeHashmapToFile(FrequencyH, "FreqHighA");
 		
 		st.close();
 		rsH.close();
