@@ -6,6 +6,10 @@
 <body>
 
 <%
+String s2="huihui6";
+//application.removeAttribute("s2");
+session.setAttribute("s2", s2);
+
 Class.forName("org.postgresql.Driver").newInstance();
 String db_url ="jdbc:postgresql://db.cs.brown.edu/squeezedb";
 String db_user="szhang";
@@ -20,9 +24,13 @@ long end = System.nanoTime();
 long interval = end - start;
 ResultSetMetaData rsmd = rs.getMetaData();
 int cols = rsmd.getColumnCount();
+
+application.setAttribute("data_test",rsmd);
+
+
 %>
-	<table border='12'>
-		<caption>Query Result at OriginalDB....</caption>
+	<h3>Query Result at OriginalDB....</h3>
+	<table border='6' style="margin-bottom: 20px; margin-top: 20px">
 		<tr>
 			<%=request.getParameter("sqlInput") %>
 			<%for(int i = 1; i <= cols; i++) {%>
@@ -37,9 +45,10 @@ int cols = rsmd.getColumnCount();
 			<%}%>
 		</tr>
 		<%}%>
+
 	</table>
 	<br\>
-	<table border='3' bgcolor="green">
+	<table border='3' bgcolor="white">
 		<tr>
 			<td>Time Cost(s):</td>
 		</tr>
@@ -47,6 +56,7 @@ int cols = rsmd.getColumnCount();
 			<td><%=(double)interval/1000000000%></td>
 		</tr>
 	</table>
+
 	<%rs.close();
 stmt.close();
 conn.close();

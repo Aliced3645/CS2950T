@@ -19,10 +19,16 @@
 <html>
 <body>
 
-	<table border='12'>
-		<caption>Query Result at SampleDB....</caption>
+	<h3>Query Result at SampleDB....</h3>
+	<table border='12' style="margin-bottom: 20px; margin-top: 20px">
+		
 		
 	<%
+		String s1="huihui5";
+		//application.removeAttribute("s1");
+		session.setAttribute("s1", s1);
+		
+	
 		Class.forName("org.postgresql.Driver").newInstance();
 		String db_url = "jdbc:postgresql://db.cs.brown.edu/squeezedb";
 		String db_user = "szhang";
@@ -86,6 +92,10 @@
 		double estimatedValueVariance = 0;
 		long estimatedValueCount = 0;
 		EstimatedResult er = new EstimatedResult();
+		
+		//application.setAttribute("sample_data_test", er);
+	
+		
 		//just test first
 		while(it.hasNext()){
 			AggregatorPair ap = it.next();
@@ -193,7 +203,7 @@
 
 	<br\>
 	
-	<table border='3' bgcolor="green">
+	<table border='3' bgcolor="white">
 		<tr>
 			<td>Time Cost(s):</td>
 		</tr>

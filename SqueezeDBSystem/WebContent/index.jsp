@@ -19,6 +19,20 @@
 <%@page import="java.util.Map"%>
 <%@page import="java.util.Map.Entry"%>
 <%@page import="java.util.TreeMap"%>
+
+
+
+<%@page import="Offline.DatabaseSampler"%>
+<%@page import="Offline.OfflineDriver"%>
+<%@page import="Offline.OfflineDriverMultiTables"%>
+<%@page import="Online.AggregatorPair"%>
+<%@page import="java.util.Properties"%>
+<%@page import="ilog.concert.IloException"%>
+<%@page import="ilog.concert.IloNumExpr"%>
+<%@page import="ilog.concert.IloNumVar"%>
+<%@page import="ilog.cplex.IloCplex"%>
+<%@page import="Online.*" language="java" pageEncoding="utf-8"%>
+
 <script src="http://d3js.org/d3.v2.js"></script>
 <html>
 <head>
@@ -29,6 +43,7 @@
 .left{
 	width: 400px;
 	float: left;
+	margin-right: 10px;
 }
 .right{
 	width: 400px;
@@ -51,11 +66,22 @@
 	function showResults(){
 		var results = document.getElementById('resultContainer');
 		results.style.display="";
+		
+	}
+	
+	function showDataResults(){
+		
+		var resultData = document.getElementById('resultData');
+		resultData.style.display="";
+		
 	}
 	
 	function hideResults(){
 		var results = document.getElementById('resultContainer');
 		results.style.display='none';
+		
+		var resultData = document.getElementById('resultData');
+		resultData.style.display='none';
 	}
 	
 </script>
@@ -67,6 +93,15 @@
 
 <!--  loading data -->
 <%
+	    ResultSetMetaData rsmd;
+		rsmd = (ResultSetMetaData)application.getAttribute("data_test");
+		
+		EstimatedResult er;
+		er = (EstimatedResult)application.getAttribute("sample_data_test");
+		
+		//huihui = "55555failure";
+		
+
 		String tuple;
 		Integer k = 0;
 		Integer v = 0;
@@ -635,19 +670,38 @@ Please select your expected query accuracy. <br>
 />
 
 <br>
-
 </form>
 
 	<!-- iframe for showing -->
 	<div id="resultContainer">
 	<div class="left">
-		 <iframe name="origin_db_result" src="testpg.jsp"  scrolling="yes" height="300px" width="400px"></iframe>
+		 <iframe name="origin_db_result" src="testpg.jsp"  scrolling="yes" height="300px" width="400px" frameborder="0" ></iframe>
 	</div>
 	<div class="right">
-		 <iframe name="sample_db_result" src="testpg_sample.jsp"  scrolling="yes" height="300px" width="400px" ></iframe>
+		 <iframe name="sample_db_result" src="testpg_sample.jsp"  scrolling="yes" height="300px" width="400px" frameborder="0" ></iframe>
 	</div>
 	</div>
+	
+<% 
 
+	String str1,str2, huihui;
+	
+	str1 = (String)session.getAttribute("s1");
+	str2 = (String)session.getAttribute("s2");	
+	huihui = str1 + " " + str2;
+	
+	//application.removeAttribute("s1");
+	//application.removeAttribute("s2");
+
+%>
+	<input type= "button" value="Show Data" name="Show_data" onclick='javascript:return showDataResults()'
+	/>
+	
+	<!-- show data -->
+	<div id="resultData">
+	<h1><%=huihui%></h1>
+	</div>
+	
 </body>
 </div>
 </html>
