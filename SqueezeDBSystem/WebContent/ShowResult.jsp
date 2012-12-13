@@ -26,6 +26,7 @@
 <%@page import="Offline.OfflineDriver"%>
 <%@page import="Offline.OfflineDriverMultiTables"%>
 <%@page import="Online.AggregatorPair"%>
+<%@page import="Online.ResultToShow"%>
 <%@page import="java.util.Properties"%>
 <%@page import="ilog.concert.IloException"%>
 <%@page import="ilog.concert.IloNumExpr"%>
@@ -36,114 +37,109 @@
 <script src="http://d3js.org/d3.v2.js"></script>
 <html>
 <head>
+<script>
+	function showResultsCompare(titleString, results){
+		var maxHeight = 240;
+		var ceiling = 250;
+		var heightRatio = results[3] / 210;
+		var svg = d3.select("body").append("svg").attr("width", 300)
+			.attr("height", 350);
+		group = svg.append("svg:g");
+		var title = group.append("svg:text").text(titleString).attr("x", 140).attr("y", 30).attr("font-family", "Verdana").attr("text-anchor", "middle")
+		.attr("font-size",20).attr("fill","Orange");
+		var resultTypeText = group.append("svg:text").text("Result Type: NULL").attr("x", 140).attr("y", 270).attr("font-family", "Verdana").attr("text-anchor", "middle")
+		.attr("font-size",15).attr("fill","Red");
+		var resultValueText = group.append("svg:text").text("Result Value: NULL").attr("x", 140).attr("y", 300).attr("font-family", "Verdana").attr("text-anchor", "middle")
+		.attr("font-size",15).attr("fill","Red");
+		
+		resultBars = group.selectAll("rect").data(results).enter()
+					.append("rect")
+					.attr("x", function(d,i){
+						return i * 40 + 60;
+					})
+					.attr("y", function(d){
+						return ceiling - d / heightRatio;
+					})
+					.attr("rx", 5)
+					.attr("ry", 5)
+					.attr("width", 35)
+					.attr("height", function(d){
+						return d / heightRatio;
+					})
+					.attr("fill", function(d,i){
+						return "hsl(210, 100%, " + (i * 10 + 20) + "%)";
+					})
+					.on("mouseover", function(d,i){
+						resultTypeText.text(function(){
+							if(i == 0 )
+								return "Result Type: ACTUAL";
+							else if(i == 1)
+								return "Result Type: ESTIMATE";
+							else if(i == 2)
+								return "Result Type: LOW BOUND";
+							else if(i == 3)
+								return "Result type: HIGH BOUND";
+						});
+						
+						resultValueText.text(function(){
+							return "Result Value: " + d;
+						})
+						
+						d3.select(this).transition().delay(0).duration(500)
+							.attr("fill", "red");
+					})
+					.on("mouseout", function(d,i){
+						d3.select(this).transition().delay(0).duration(500)
+						.attr("fill", function(){
+							return "hsl(210, 100%, " + (i * 10 + 20) + "%)";
+						})
+					})
+					;
+	}
+</script>
 </head>
 <body>
-<h1>success</h1>
-
-<% 
-
-
-	String str1,str2, huihui;
-	
-	str1 = (String)session.getAttribute("s1");
-	str2 = (String)session.getAttribute("s2");	
-	
-	//application.removeAttribute("s1");
-	//application.removeAttribute("s2");
-	
-	//ResultSet rs;
-	//rs = (ResultSet)application.getAttribute("result_set");
-	Vector<String> v =  (Vector<String>) application.getAttribute("result_dataset");
-//	if(v != null){
-		int size = v.size();
-		String test = "";
-		for(int i = 0; i<v.size() ;i++)
-			test = test + v.get(i);
-//	}
-	    ResultSetMetaData rsmd;
-		rsmd = (ResultSetMetaData)application.getAttribute("data_test");
-			
+<script type="text/javascript">
+	<%
+		Vector<String> v = (Vector<String>) application.getAttribute("result_dataset");
+		ResultSetMetaData rsmd;
+		rsmd = (ResultSetMetaData) application.getAttribute("data_test");
 		EstimatedResult er;
-		er = (EstimatedResult)application.getAttribute("sample_data_test");
-		
-		huihui = str1 + " " + str2;
-		
+		er = (EstimatedResult) application.getAttribute("sample_data_test");
 		int cols = rsmd.getColumnCount();
-	
-%>
-
-<h2><%=test %></h2>
-
-	<div>
-	<table border='6' style="margin-bottom: 20px; margin-top: 20px; float:left ; margin-left: 50px; margin-right: 50px">
-	
-		<tr>
-			<%for(int i = 1; i <= cols; i++) {%>
-			<th><%=rsmd.getColumnName(i)%></th>
+		
+		//regenerate the data structure
+		Vector<ResultToShow> toShows = ResultToShow.getResultsToShow(v, er);
+		Iterator<ResultToShow> it = toShows.iterator();
+	%>	
+	<%
+		while(it.hasNext()){
+			ResultToShow show = it.next(); 
+			String s = show.aggregatorName;%>
+			var results = new Array(4);
+			results[0] = <%=show.actualValue%>
+			results[1] = <%=show.estimatedValue%>
+			results[2] = <%=show.lowerBound%>
+			results[3] = <%=show.upperBound%>
+			<% if(s.equals("AVG")){ %>
+				showResultsCompare("AVG",results);
 			<%}%>
-		</tr>
-		<br\>		
-		<tr>
-			<%
-				ListIterator<String> iter = v.listIterator();
-				while(iter.hasNext()) {%>
-				<%
-				String ans = (String)iter.next();
-				%>
-				<td><%=ans%></td>
+			<% if(s.equals("SUM")){ %>
+				showResultsCompare("SUM",results);
 			<%}%>
-		</tr>
+			<% if(s.equals("VAR")){ %>
+				showResultsCompare("VAR",results);
+			<%}%>
+			<% if(s.equals("COUNT")){ %>
+				showResultsCompare("COUNT",results);
+			<%}%>
+	<%
+	}
+	%>
 	
-	</table>
-	</div>
+
 	
-	<div>
-	<table border='6' style="float: left">
-	
-			<tr>
-			<th>Estimated Aggregator</th>
-			<% Iterator<String> its = er.aggregateName.iterator();
-				while(its.hasNext()){
-					String aggregatename = its.next(); %>	
-				<th>Estimated <%=aggregatename %></th>
-			<% }%>
-		</tr>
-		<br\>
-		
-		<tr>
-			<th>Estimated Value</th>
-			<% Iterator<Double> itd = er.estimatedValue.iterator();
-				while(itd.hasNext()){
-					double answer = itd.next(); %>	
-				<th><%=(long)answer%></th>
-			<% }%>
-		</tr>
-		<br\>
-		
-		<tr>
-			<th>Lower Bound</th>
-			<% Iterator<Double> itl = er.lowerBound.iterator();
-				while(itl.hasNext()){
-					double answer = itl.next(); %>	
-				<th><%=(long)answer%></th>
-			<% }%>
-		</tr>
-		<br\>
-		
-		<tr>
-			<th>Upper Bound</th>
-			<% Iterator<Double> itu = er.upperBound.iterator();
-				while(itu.hasNext()){
-					double answer = itu.next(); %>	
-				<th><%=(long)answer%></th>
-			<% }%>
-		</tr>
-		<br\>
-		
-	</table>
-	</div>
-	
-	
-	
+
+</script>
 </body>
 </html>

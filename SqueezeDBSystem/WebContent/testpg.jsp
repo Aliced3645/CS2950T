@@ -50,8 +50,9 @@ Vector<String> result_v = new Vector<String>();
 			
 			String ans = rs.getString(i);
 			result_v.add(ans);
+			double a = Double.parseDouble(ans);
 			%>
-			<td><%=ans%></td>
+			<td><%=(long)a%></td>
 			<%}%>
 		</tr>
 		<%}%>
