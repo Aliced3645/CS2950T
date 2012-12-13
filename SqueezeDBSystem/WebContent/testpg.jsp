@@ -6,9 +6,7 @@
 <body>
 
 <%
-String s2="huihui6";
-//application.removeAttribute("s2");
-session.setAttribute("s2", s2);
+
 
 Class.forName("org.postgresql.Driver").newInstance();
 String db_url ="jdbc:postgresql://db.cs.brown.edu/squeezedb";
@@ -26,9 +24,17 @@ ResultSetMetaData rsmd = rs.getMetaData();
 int cols = rsmd.getColumnCount();
 
 application.setAttribute("data_test",rsmd);
+//application.setAttribute("result_set",rs);
+
+String s2="55";
+application.removeAttribute("s2");
+session.setAttribute("s2", s2);
+
+Vector<String> result_v = new Vector<String>();
 
 
 %>
+	<center>
 	<h3>Query Result at OriginalDB....</h3>
 	<table border='6' style="margin-bottom: 20px; margin-top: 20px">
 		<tr>
@@ -40,8 +46,12 @@ application.setAttribute("data_test",rsmd);
 		<br\>
 		<%while(rs.next()) {%>
 		<tr>
-			<%for(int i = 1; i <= cols; i++) {%>
-			<td><%=rs.getString(i)%></td>
+			<%for(int i = 1; i <= cols; i++) {
+			
+			String ans = rs.getString(i);
+			result_v.add(ans);
+			%>
+			<td><%=ans%></td>
 			<%}%>
 		</tr>
 		<%}%>
@@ -56,10 +66,13 @@ application.setAttribute("data_test",rsmd);
 			<td><%=(double)interval/1000000000%></td>
 		</tr>
 	</table>
+	</center>
 
-	<%rs.close();
-stmt.close();
-conn.close();
-%>
+	<%
+		application.setAttribute("result_dataset",result_v);
+		rs.close();
+		stmt.close();
+		conn.close();
+	%>
 </body>
 </html>

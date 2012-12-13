@@ -71,8 +71,10 @@
 	
 	function showDataResults(){
 		
-		var resultData = document.getElementById('resultData');
+		var resultData = document.getElementById('content');
 		resultData.style.display="";
+		
+		content.innerHTML = "<iframe name=\"data_result\" src=\"ShowResult.jsp\"  scrolling=\"yes\" height=\"300px\" width=\"800px\" frameborder=\"0\" ></iframe>"; 
 		
 	}
 	
@@ -93,15 +95,6 @@
 
 <!--  loading data -->
 <%
-	    ResultSetMetaData rsmd;
-		rsmd = (ResultSetMetaData)application.getAttribute("data_test");
-		
-		EstimatedResult er;
-		er = (EstimatedResult)application.getAttribute("sample_data_test");
-		
-		//huihui = "55555failure";
-		
-
 		String tuple;
 		Integer k = 0;
 		Integer v = 0;
@@ -682,24 +675,12 @@ Please select your expected query accuracy. <br>
 	</div>
 	</div>
 	
-<% 
-
-	String str1,str2, huihui;
+	<input type= "button" value="Show Data" name="Show_data" onclick='showDataResults()'>
 	
-	str1 = (String)session.getAttribute("s1");
-	str2 = (String)session.getAttribute("s2");	
-	huihui = str1 + " " + str2;
-	
-	//application.removeAttribute("s1");
-	//application.removeAttribute("s2");
-
-%>
-	<input type= "button" value="Show Data" name="Show_data" onclick='javascript:return showDataResults()'
-	/>
 	
 	<!-- show data -->
-	<div id="resultData">
-	<h1><%=huihui%></h1>
+	<div id="content">
+		
 	</div>
 	
 </body>

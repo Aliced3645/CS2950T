@@ -19,16 +19,13 @@
 <html>
 <body>
 
+	<center>
 	<h3>Query Result at SampleDB....</h3>
-	<table border='12' style="margin-bottom: 20px; margin-top: 20px">
+	
+	<table border='6' style="margin-bottom: 20px; margin-top: 20px">
 		
 		
 	<%
-		String s1="huihui5";
-		//application.removeAttribute("s1");
-		session.setAttribute("s1", s1);
-		
-	
 		Class.forName("org.postgresql.Driver").newInstance();
 		String db_url = "jdbc:postgresql://db.cs.brown.edu/squeezedb";
 		String db_user = "szhang";
@@ -92,8 +89,10 @@
 		double estimatedValueVariance = 0;
 		long estimatedValueCount = 0;
 		EstimatedResult er = new EstimatedResult();
-		
-		//application.setAttribute("sample_data_test", er);
+			
+	    String s1="lala";
+		//application.removeAttribute("s1");
+		session.setAttribute("s1", s1);
 	
 		
 		//just test first
@@ -155,6 +154,7 @@
 				er.estimatedValue.add(k);
 			}
 		}
+		application.setAttribute("sample_data_test", er);
 		%>
 		
 		<tr>
@@ -211,6 +211,8 @@
 			<td><%=(double) interval / 1000000000%></td>
 		</tr>
 	</table>
+	
+	</center>
 	<%
 		rs.close();
 		stmt.close();
