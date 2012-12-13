@@ -39,6 +39,7 @@
 <style>
 .page{
 	width:1000px;
+	float: left;
 }
 .left{
 	width: 400px;
@@ -74,7 +75,7 @@
 		var resultData = document.getElementById('content');
 		resultData.style.display="";
 		
-		content.innerHTML = "<iframe name=\"data_result\" src=\"ShowResult.jsp\"  scrolling=\"yes\" height=\"300px\" width=\"800px\" frameborder=\"0\" ></iframe>"; 
+		content.innerHTML = "<iframe name=\"data_result\" src=\"ShowResult.jsp\" scrolling=\"no\" height=\"500px\" width=\"1200px\" frameborder=\"0\" ></iframe>"; 
 		
 	}
 	
@@ -668,20 +669,22 @@ Please select your expected query accuracy. <br>
 	<!-- iframe for showing -->
 	<div id="resultContainer">
 	<div class="left">
-		 <iframe name="origin_db_result" src="testpg.jsp"  scrolling="yes" height="300px" width="400px" frameborder="0" ></iframe>
+		 <iframe name="origin_db_result" src="testpg.jsp"  scrolling="no" height="500px" width="400px" frameborder="0" ></iframe>
 	</div>
 	<div class="right">
-		 <iframe name="sample_db_result" src="testpg_sample.jsp"  scrolling="yes" height="300px" width="400px" frameborder="0" ></iframe>
+		 <iframe name="sample_db_result" src="testpg_sample.jsp"  scrolling="no" height="500px" width="400px" frameborder="0" ></iframe>
 	</div>
 	</div>
-	
-	<input type= "button" value="Show Data" name="Show_data" onclick='showDataResults()'>
-	
-	
+	 
+	 
 	<!-- show data -->
-	<div id="content">
-		
+	<div style="margin-top: 0px; float:left">
+		<input type= "button" value="Show Data" name="Show_data" onclick='showDataResults()' style="float:left; position:relative;width:100px;height:20px;">
+		<div id="content">
+			
+		</div>
 	</div>
+	
 	
 </body>
 </div>

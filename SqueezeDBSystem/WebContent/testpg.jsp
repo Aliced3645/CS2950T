@@ -26,10 +26,6 @@ int cols = rsmd.getColumnCount();
 application.setAttribute("data_test",rsmd);
 //application.setAttribute("result_set",rs);
 
-String s2="55";
-application.removeAttribute("s2");
-session.setAttribute("s2", s2);
-
 Vector<String> result_v = new Vector<String>();
 
 
