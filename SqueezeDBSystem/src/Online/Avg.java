@@ -20,7 +20,11 @@ public class Avg {
 		HashMap<Integer, Integer> frequencies = new HashMap<Integer, Integer>();
 		Integer k;
 		Integer v;
-
+		
+		result.last();
+		int resultSize = result.getRow();
+		result.first();
+		
 		long sum = 0;
 		double avg = 0;
 		
@@ -41,18 +45,24 @@ public class Avg {
 			sum += entry.getKey() * (entry.getValue() / (double) sample_size)
 					* db_size;
 		}
-		
-		avg = sum / db_size;
+		//estimate the db_size!
+		int db_size_selected = db_size * resultSize / sample_size;
+		avg = sum / db_size_selected;
 
 		return avg;
 	}
 
 	public static double[] calculateAvgConfidenceInterval(ResultSet resultSet,
-			String columnName, int sampleSize, int dbSize, double epsilon) {
+			String columnName, int sampleSize, int dbSize, double epsilon) throws SQLException {
 		double[] bounds = new double[2];
 		CplexSolution solution_min;
 		CplexSolution solution_max;
-
+		
+		resultSet.last();
+		int resultSize = resultSet.getRow();
+		resultSet.first();
+		int db_size_selected = dbSize * resultSize / sampleSize;
+		
 		HashMap<Integer, Integer> frequencies = new HashMap<Integer, Integer>();
 		double[] selectivity;
 
@@ -107,8 +117,8 @@ public class Avg {
 			solution_max = SumSolver.sumSolver(min, max, query_selectivity,
 						selectivity, eta, epsilon, true);
 			
-			bounds[0] = (solution_min.objective_value * dbSize) / ( dbSize * ( query_selectivity + epsilon));
-			bounds[1] = solution_max.objective_value * dbSize / ( dbSize * ( query_selectivity - epsilon));
+			bounds[0] = (solution_min.objective_value * dbSize) / ( db_size_selected * ( query_selectivity + epsilon));
+			bounds[1] = solution_max.objective_value * dbSize / ( db_size_selected * ( query_selectivity - epsilon));
 			
 		} catch (Exception e) {
 			e.printStackTrace(System.out);

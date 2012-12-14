@@ -21,30 +21,35 @@ public class Aggregator {
 	public Vector<AggregatorPair> aggregators;
 	
 	public void getAggregator(String originSQL) throws ParseException {
-		
-		InputStream is = new ByteArrayInputStream(originSQL.getBytes());
-		ZqlParser parser = new ZqlParser(is);
-		ZQuery statement = (ZQuery) parser.readStatement();
-		Vector<ZSelectItem> ss = statement.getSelect();
-		Iterator<ZSelectItem> it = ss.iterator();
-		while(it.hasNext()){
-			//print sth
-			ZSelectItem temp = it.next();
-			AggregatorPair ap = new AggregatorPair();
-			ap.aggregator = temp.getAggregate();
-			String aggregateString = temp.getColumn();
-			int j = 0;
-			for(int i = 0; i < aggregateString.length(); i ++){
-				if(aggregateString.charAt(i) == '('){
-					j = i;
-					break;
+		try{
+			InputStream is = new ByteArrayInputStream(originSQL.getBytes());
+			ZqlParser parser = new ZqlParser(is);
+			ZQuery statement = (ZQuery) parser.readStatement();
+			Vector<ZSelectItem> ss = statement.getSelect();
+			Iterator<ZSelectItem> it = ss.iterator();
+			while(it.hasNext()){
+				//print sth
+				ZSelectItem temp = it.next();
+				AggregatorPair ap = new AggregatorPair();
+				ap.aggregator = temp.getAggregate();
+				String aggregateString = temp.getColumn();
+				int j = 0;
+				for(int i = 0; i < aggregateString.length(); i ++){
+					if(aggregateString.charAt(i) == '('){
+						j = i;
+						break;
+					}
 				}
+				String columnName = aggregateString.substring(j+1,aggregateString.length()-1);
+				ap.column = columnName;
+				aggregators.add(ap);	
 			}
-			String columnName = aggregateString.substring(j+1,aggregateString.length()-1);
-			ap.column = columnName;
-			aggregators.add(ap);	
+		}catch(ParseException e){
+			System.out.println("cao");
+			System.out.println(e.toString());
 		}
 	}
+	
 	
 	
 	public static void main(String[] args) throws ClassNotFoundException, SQLException, IOException, ParseException {

@@ -33,7 +33,7 @@
 <%@page import="ilog.concert.IloNumVar"%>
 <%@page import="ilog.cplex.IloCplex"%>
 <%@page import="Online.*" language="java" pageEncoding="utf-8"%>
-
+<%@page errorPage="SyntexErr.jsp"%>
 <script src="http://d3js.org/d3.v2.js"></script>
 <html>
 <head>

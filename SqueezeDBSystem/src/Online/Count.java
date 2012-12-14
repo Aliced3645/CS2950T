@@ -15,31 +15,13 @@ import java.util.Map.Entry;
 //select count(value) from bigdata where value=10
 
 public class Count {
-	public static long process(ResultSet result, String columnName,  int sample_size, int db_size,
-			int target_value) throws SQLException {
+	public static long process(ResultSet result, String columnName,  int sample_size, int db_size) throws SQLException {
 
-		HashMap<Integer, Integer> frequencies = new HashMap<Integer, Integer>();
-		Integer k;
-		Integer v;
-
-		long count = 0;
-
-		while (result.next()) {
-			k = new Integer(result.getInt(columnName));// sum first column
-			if (frequencies.containsKey(k)) {
-				v = frequencies.get(k);
-				frequencies.put(k, new Integer(++v));
-			} else
-				frequencies.put(k, new Integer(1));
-
-		}
-
-		Integer frequency = frequencies.get(target_value);
-		// estimate
-		if (frequency == null)
-			return  0;
+		result.last();
+		int resultSize = result.getRow();
+		result.first();
 		
-		count = frequency * db_size / sample_size;
+		long count = resultSize * db_size / sample_size;
 		return count;
 		
 	}
@@ -47,13 +29,15 @@ public class Count {
 	
 	
 	public static double[] calculateCountConfidenceInterval(ResultSet resultSet,
-			String columnName, int sampleSize, int dbSize, double epsilon, int target_value) {
+			String columnName, int sampleSize, int dbSize, double epsilon) {
+
+		// order: solution_min, solution_max ( confidence bounds )
 		double[] bounds = new double[2];
-		CplexSolution solution_min = null;
-		CplexSolution solution_max = null;
+		CplexSolution solution_min;
+		CplexSolution solution_max;
 
 		HashMap<Integer, Integer> frequencies = new HashMap<Integer, Integer>();
-		HashMap<Integer, Float> selectivities = new HashMap<Integer, Float>();
+		double[] selectivity;
 
 		double eta = (double) dbSize / ((double) sampleSize);
 		double query_selectivity = 0;
@@ -76,39 +60,41 @@ public class Count {
 				{
 					v = frequencies.get(k);
 					v += 1;
+
 					frequencies.put(k, new Integer(v));
 				} else {
 					frequencies.put(k, new Integer(1));
 				}
 			}
 
-			Iterator<Map.Entry<Integer, Integer>> it = frequencies.entrySet()
-					.iterator();
-			while (it.hasNext()) {
-				Entry<Integer, Integer> entry = (Entry<Integer, Integer>) it
-						.next();
-				
-				selectivities
-						.put(entry.getKey(), new Float((float) entry.getValue()
-								/ (float) sampleSize));
-				query_selectivity += (float) entry.getValue()
-						/ (float) sampleSize;
+			// calculate selectivity: the percentage of a value appears in the
+			// sampled dataset
+			selectivity = new double[max - min + 1];
+
+			for (int i = min, index = 0; i <= max; i++, index++) {
+				v = frequencies.get(new Integer(i));
+
+				if (v != null) {
+					selectivity[index] = v.intValue() / ((double) sampleSize);
+				} else {
+					selectivity[index] = 0;
+				}
+			}
+			// get query selectivity ( sum of selectivity)
+			for (int i = 0; i < (max - min + 1); i++) {
+				query_selectivity += selectivity[i];
 			}
 
-			double lowerBound, upperBound;
-			Float target_selectivity = selectivities.get(target_value);
-			if (target_selectivity == null) {
-				bounds[0] = 0;
-				bounds[1] = 0;
-				return bounds;
-			}
-			solution_max = CountSolver.solveCount(target_value, query_selectivity, selectivities, target_selectivity, eta, epsilon, true);
-			solution_min = CountSolver.solveCount(target_value, query_selectivity, selectivities, target_selectivity, eta, epsilon, false);
-			
-		
+			// min bound
+			solution_min = CountSolver.countSolver(min, max, query_selectivity,
+					selectivity, eta, epsilon, false);
+			// max bound
+			solution_max = CountSolver.countSolver(min, max, query_selectivity,
+					selectivity, eta, epsilon, true);
+
 			bounds[0] = solution_min.objective_value * dbSize;
 			bounds[1] = solution_max.objective_value * dbSize;
-			
+
 		} catch (Exception e) {
 			e.printStackTrace(System.out);
 		}
@@ -116,4 +102,5 @@ public class Count {
 		return bounds;
 
 	}
+
 }

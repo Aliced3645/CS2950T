@@ -36,31 +36,40 @@
 				.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
 						ResultSet.CONCUR_UPDATABLE);
 		String originSQL = request.getParameter("sqlInput");
-		String originTable = tableParser.getTableName(originSQL);
+		String[] parts = originSQL.split(" ");
+		boolean varianceB = false;
+		for(int i = 0; i < parts.length; i ++){
+			if(parts[i].charAt(0) == 'v'){
+				varianceB = true;
+				break;
+			}
+		}
+		String originTable = tableParser.getTableName(originSQL,varianceB);
 		String inputRadio = request.getParameter("accuracy");
-		int sampleSize;
+		int sampleSize = 0;
 		double epsilon = 0;
 		String tableName = null;
 		int lineNumber;
+		
 		if (!inputRadio.isEmpty()) {
 			if (inputRadio.equals("highAccuracy")) {
 				if(originTable.equals("a")) tableName = "aj_h";
 				else if(originTable.equals("b")) tableName = "bj_h";
 				else if(originTable.equals("c")) tableName = "cj_h";
-				lineNumber = OfflineDriverMultiTables.sampleRowNumberHigh;
+				sampleSize = 9235;
 				epsilon = 0.1;
 			} else if (inputRadio.equals("middleAccuracy")) {
 				if(originTable.equals("a")) tableName = "aj_m";
 				else if(originTable.equals("b")) tableName = "bj_m";
 				else if(originTable.equals("c")) tableName = "cj_m";
-				lineNumber = OfflineDriverMultiTables.sampleRowNumberMid;
 				epsilon = 0.2;
+				sampleSize = 2309;
 			} else if (inputRadio.equals("lowAccuracy")) {
 				if(originTable.equals("a")) tableName = "aj_l";
 				else if(originTable.equals("b")) tableName = "bj_l";
 				else if(originTable.equals("c")) tableName = "cj_l";
-				lineNumber = OfflineDriverMultiTables.sampleRowNumberLow;
 				epsilon = 0.3;
+				sampleSize = 1027;
 			} else {
 				tableName = "a";
 				lineNumber = 100000;
@@ -71,14 +80,41 @@
 			lineNumber = 100000;
 		}
 		
-		Aggregator aggregator = new Aggregator();
-		aggregator.getAggregator(originSQL);
+
 		//parsed!
-		Iterator<AggregatorPair> it = aggregator.aggregators.iterator();
-		String sql_sentence = SqlRegenerator.regenerate(originSQL, tableName);	
+		String sql_sentence;
+		Iterator<AggregatorPair> it;
+		if(varianceB == false){
+			Aggregator aggregator = new Aggregator();
+			aggregator.getAggregator(originSQL);
+			it = aggregator.aggregators.iterator();
+			sql_sentence = SqlRegenerator.regenerate(originSQL, tableName);	
+			System.out.println(sql_sentence);
+		}
+		else{
+			sql_sentence = SqlRegenerator.regenerate2(originSQL, tableName);
+			System.out.println(sql_sentence);
+			Aggregator aggregator = new Aggregator();
+			AggregatorPair ap = new AggregatorPair();
+			int start = 0, end = 0;
+			for(int i = 0; i < originSQL.length(); i ++){
+				if(originSQL.charAt(i) == '('){
+					start = i+1;
+				}
+				if(originSQL.charAt(i) == ')'){
+					end = i;
+				}
+			}
+			ap.column =  originSQL.substring(start, end);
+			System.out.print(ap.column);
+			ap.aggregator = "variance";
+			aggregator.aggregators.add(ap);
+			it = aggregator.aggregators.iterator();
+		}
 		long start = System.nanoTime();
 		ResultSet rs = stmt.executeQuery(sql_sentence);
 		long end = System.nanoTime();
+
 		long interval = end - start;
 		int target_value = 0;
 		System.out.println(sql_sentence);
@@ -89,11 +125,11 @@
 		double estimatedValueVariance = 0;
 		long estimatedValueCount = 0;
 		EstimatedResult er = new EstimatedResult();
-			
-	    String s1="lala";
-		//application.removeAttribute("s1");
-		session.setAttribute("s1", s1);
-	
+
+		rs.last();
+		lineNumber = rs.getRow();
+		rs.first();
+		System.out.println(lineNumber);
 		
 		//just test first
 		while(it.hasNext()){
@@ -101,9 +137,9 @@
 			rs.first();
 			//try to calculate the confidence interval
 			if(ap.aggregator.equals("sum")){
-				estimatedValueSum = Sum.process(rs, ap.column, lineNumber, 100000);
+				estimatedValueSum = Sum.process(rs, ap.column, sampleSize, 100000);
 				rs.first();
-				bounds = Sum.calculateSumConfidenceInterval(rs, ap.column, lineNumber, 100000, epsilon);
+				bounds = Sum.calculateSumConfidenceInterval(rs, ap.column, sampleSize, 100000, epsilon);
 				bounds[0] += estimatedValueSum;
 				bounds[1] += estimatedValueSum;
 				er.aggregateName.add("SUM");
@@ -113,9 +149,9 @@
 				er.estimatedValue.add(k);
 			}
 			else if(ap.aggregator.equals("avg")){
-				bounds = Avg.calculateAvgConfidenceInterval(rs, ap.column,lineNumber, 100000, epsilon);
+				bounds = Avg.calculateAvgConfidenceInterval(rs, ap.column,sampleSize, 100000, epsilon);
 				rs.first();
-				estimatedValueAvg = Avg.process(rs, ap.column, lineNumber, 100000);
+				estimatedValueAvg = Avg.process(rs, ap.column, sampleSize, 100000);
 				bounds[0] += estimatedValueAvg;
 				bounds[1] += estimatedValueAvg;
 				er.aggregateName.add("AVG");
@@ -124,9 +160,9 @@
 				er.estimatedValue.add(estimatedValueAvg);
 			}
 			else if(ap.aggregator.equals("variance")){
-				estimatedValueVariance = Variance.process(rs, ap.column,lineNumber, 100000);
+				estimatedValueVariance = Variance.process(rs, ap.column,sampleSize, 100000);
 				rs.first();
-				bounds = Variance.calculateVarianceConfidenceInterval(rs, ap.column,lineNumber, 100000, epsilon);
+				bounds = Variance.calculateVarianceConfidenceInterval(rs, ap.column,sampleSize, 100000, epsilon);
 				er.aggregateName.add("VAR");
 				er.upperBound.add(bounds[1]);
 				er.lowerBound.add(bounds[0]);
@@ -135,16 +171,9 @@
 			else if(ap.aggregator.equals("count")){
 				//get the value to query
 				//TODO:to modify
-				int startIndex = 0, endIndex = 0;
-				for(int i = 0; i < originSQL.length(); i ++){
-					if(originSQL.charAt(i) == '=')
-						startIndex = i;
-				}
-				String numStr = originSQL.substring(startIndex + 1);
-				target_value = Integer.parseInt(numStr);
-				estimatedValueCount = Count.process(rs, ap.column,lineNumber, 100000, target_value);
+				estimatedValueCount = Count.process(rs, ap.column,sampleSize, 100000);
 				rs.first();
-				bounds = Count.calculateCountConfidenceInterval(rs, ap.column,lineNumber, 100000, epsilon, target_value);
+				bounds = Count.calculateCountConfidenceInterval(rs, ap.column,sampleSize, 100000, epsilon);
 				bounds[0] += estimatedValueCount;
 				bounds[1] += estimatedValueCount;
 				er.aggregateName.add("COUNT");

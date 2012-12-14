@@ -630,9 +630,17 @@ The three sample tables has different sizes, in principle, table with bigger siz
 <form id="submit_query_form" method ="POST">
 <br>
 <p>
-Sample Query:
+Example Queries:
 <br>
-select sum(av),avg(bv),avg(cv) from a,b,c where ((a.bi = b.bi) AND (b.ci = c.ci));
+select sum(av) from a;<br>
+select sum(av),avg(bv),avg(cv) from a,b,c where ((a.bi = b.bi) AND (b.ci = c.ci)); <br>
+select count(bv) from b; <br>
+select count(bv) from b where bv > 6000; <br>
+select variance(av) from a; <br>
+select sum(av) from a where av > 5000;<br>
+select avg(av) from a where av > 6000; <br>
+select sum(av),avg(bv),avg(cv) from a,b,c where ((a.bi = b.bi) AND (b.ci = c.ci)) AND ((av < 5000) AND (bv < 5000 OR cv < 5000));<br>
+
 </p>
 <div id="sqlInput_div" style="height:200px;width:500px;float:left;">
 <script type="text/javascript"> 
